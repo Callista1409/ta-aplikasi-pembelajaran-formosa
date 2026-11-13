@@ -1,0 +1,338 @@
+@if (step() !== 'test' && step() !== 'result') {
+  @if (data.contentLoading()) { <p role="status">Memuat materi...</p> }
+  @if (data.contentError()) {
+    <div class="speech-message error" role="alert">
+      <p>{{ data.contentError() }}</p>
+      <button class="button secondary" [disabled]="data.contentLoading()" (click)="retryContent()">Coba lagi</button>
+    </div>
+  }
+}
+
+@if (posttestMode && step() === 'intro') {
+  <section class="posttest-preparation">
+    <header class="lesson-subheading">
+      <a class="student-back-button" routerLink="../lesson" aria-label="Kembali belajar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6-6-6 6 6 6" /></svg></a>
+      <div><span class="posttest-eyebrow">Mode khusus · SD {{ posttest.grade() }}</span><h1>Posttest</h1><p class="muted">Pastikan kamu sudah mempelajari materi sebelum mengerjakan posttest.</p></div>
+    </header>
+    <div class="posttest-overview">
+      <article class="posttest-intro-card">
+        <h2>@if (posttest.ready()) { {{ posttest.plan().length }} soal, empat kemampuan } @else { Materi posttest }</h2>
+        <div class="posttest-categories">@for (category of posttest.summary().categories; track category.category) { <span>{{ category.total }} {{ categoryLabel(category.category) }}</span> }</div>
+        <p>Soal dengan flashcard yang belum tersedia dilewati. Setiap jawaban benar bernilai 1; nilai dihitung dari soal yang tersedia dan disimpan terpisah dari poin latihan.</p>
+        <p>Listening diputar dua kali. Speaking memakai mikrofon. Writing mencatat kesalahan dan total goresan, dengan kotak tanpa contoh karakter. Kesalahan mengurangi nilai secara bertahap.</p>
+        @if (posttest.session()?.status === 'completed') {
+          <p class="posttest-ready">Posttest kelas ini sudah selesai.</p>
+          <button class="button" (click)="startPosttest()">Lihat hasil posttest</button>
+        } @else {
+          @if (posttest.session(); as session) { <p>{{ session.answers.length }}/{{ session.plan.length }} jawaban tersimpan. Kamu bisa melanjutkan sesi ini.</p> }
+          @if (!posttest.session()) {
+            <label class="posttest-confirmation"><input type="checkbox" [checked]="posttestStudyConfirmed()" (change)="posttestStudyConfirmed.set($any($event.target).checked)"><span>Saya sudah mempelajari materi dan siap mengerjakan posttest.</span></label>
+          }
+          <button class="button" [disabled]="!canTest()" (click)="startPosttest()">{{ posttest.saving() ? 'Menyiapkan sesi...' : posttest.session() ? 'Lanjutkan posttest' : canTest() ? 'Mulai posttest' : 'Tandai konfirmasi untuk melanjutkan' }}</button>
+        }
+        @if (!posttest.loaded() && !posttest.error()) { <p role="status">Memuat riwayat posttest...</p> }
+        @if (posttest.error() || posttestStartError()) { <p class="speech-message error" role="alert">{{ posttestStartError() || posttest.error() }}</p> }
+      </article>
+      <article class="posttest-progress-card">
+        <div class="panda small"><app-mascot-display [variant]="posttest.ready() ? 'quiz-terbuka' : 'quiz-terkunci'" /></div>
+        <strong>{{ posttest.vocabulary().length - posttest.missing().length }}/{{ posttest.vocabulary().length }} kosakata tersedia</strong>
+        <p>{{ posttest.ready() ? 'Materi posttest tersedia. Konfirmasi belajar untuk mulai.' : 'Sebagian materi kosakata belum tersedia.' }}</p>
+        <label class="posttest-mark-all">
+          <input #markAllCheckbox type="checkbox" [checked]="bulkPosttestChecked()"
+            [disabled]="markingAllLearned() || !cards().length"
+            (change)="markAllPosttestLearned(markAllCheckbox)">
+          <span>{{ markingAllLearned() ? 'Menyimpan tanda dipelajari...' : 'Tandai semua kosakata sudah dipelajari' }}</span>
+        </label>
+        <p class="muted">Centang ini bisa dibatalkan. Kosakata yang ditandai manual tetap dipertahankan.</p>
+        @if (posttest.missing().length) { <p class="muted">Centang semua menandai kartu yang tersedia. Kosakata yang belum tersedia tetap perlu dilengkapi guru.</p> }
+        @if (markAllLearnedError()) { <p class="speech-message error" role="alert">{{ markAllLearnedError() }}</p> }
+        @if (posttest.missing().length) {
+          <p class="speech-message">{{ posttest.missing().length }} kosakata tanpa flashcard akan dilewati dalam posttest.</p>
+          <details class="posttest-missing"><summary>Kosakata yang belum tersedia</summary><ul>
+            @for (row of posttest.missing(); track row.id) { <li><span lang="zh-Hans">{{ row.word }}</span> · SD {{ row.grade }} · Bab {{ row.chapter }}</li> }
+          </ul></details>
+        }
+      </article>
+    </div>
+  </section>
+}
+
+@if (!posttestMode && step() === 'intro') {
+  <section class="lesson-empty lesson-intro">
+    <a class="student-back-button lesson-home-back" routerLink="../dashboard" title="Kembali ke dashboard" aria-label="Kembali ke dashboard">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6-6-6 6 6 6" /></svg>
+    </a>
+    <h1>Pilih unit, pelajari flashcard, lalu tes kemampuanmu!</h1>
+    <div class="panda"><app-mascot-display variant="mulai-quiz" /></div>
+    <button class="button" (click)="navigateStep('units')">Pilih Unit</button>
+  </section>
+}
+
+@if (step() === 'units') {
+  <section class="unit-page">
+    <header class="lesson-subheading">
+      <button class="student-back-button" type="button" (click)="backTo('intro')" title="Kembali ke pengantar" aria-label="Kembali ke pengantar">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6-6-6 6 6 6" /></svg>
+      </button>
+      <div><h1>Pilih Unit</h1><p class="muted">Buka satu unit untuk mulai belajar.</p></div>
+    </header>
+    <div class="unit-grid">
+      @for (unit of availableUnits(); track unit.id) {
+        <button (click)="selectUnit(unit.id)">
+          <strong>SD {{ unit.grade }}</strong><b>Unit {{ unitNumber(unit) ?? '—' }} · {{ unitDisplayName(unit) }}</b>
+          <span>Buka unit untuk memuat materi dan progresnya</span>
+        </button>
+      }
+    </div>
+    <section class="posttest-entry" aria-label="Posttest khusus">
+      <div><span class="posttest-eyebrow">Setelah selesai belajar</span><h2>Posttest@if (posttest.ready()) { · {{ posttest.plan().length }} soal }</h2><p>Konfirmasi sudah belajar untuk membuka posttest.</p></div>
+      <div class="posttest-entry-actions">
+        <a class="button secondary" routerLink="../posttest">Lihat kosakata wajib</a>
+        <a class="button" routerLink="../posttest">{{ posttest.session()?.status === 'completed' ? 'Lihat hasil posttest' : 'Buka posttest' }}</a>
+      </div>
+    </section>
+
+  </section>
+}
+
+@if (step() === 'cards' || (posttestMode && step() === 'intro')) {
+  <div class="lesson-cards-scene">
+  <header class="lesson-heading">
+    @if (!posttestMode) {
+    <button class="student-back-button change-unit" type="button" title="Kembali pilih unit" aria-label="Kembali pilih unit" (click)="backTo('units')">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6-6-6 6 6 6" /></svg>
+    </button>
+    }
+    <div><h1>{{ posttestMode ? 'Flashcard kosakata wajib' : 'Flashcard' }}</h1><p>{{ posttestMode ? 'Semua kosakata utama dan pendukung untuk posttest kelasmu.' : unitDisplayName(selectedUnit()) }}</p></div>
+  </header>
+
+  <section class="flashcard-workspace" [class.with-word-list]="wordListOpen()">
+    <div class="card-toolbar">
+      <button class="vocabulary-button" type="button" (click)="wordListOpen.set(!wordListOpen())">
+        <span>☰</span> {{ wordListOpen() ? 'Tutup kosa kata' : 'Semua kosa kata' }}
+      </button>
+      <button class="vocabulary-button format-button" type="button" (click)="toggleCardFormat()">
+        <span aria-hidden="true">文</span> {{ cardFormat() === 'image' ? 'Mode Visual' : 'Mode Mandarin' }}
+      </button>
+      <app-ui-select ariaLabel="Urutan flashcard" [options]="orderOptions" [value]="orderMode()" (valueChange)="changeOrder($event)" />
+    </div>
+
+    @if (activeCard(); as card) {
+      @if (posttestMode) { <p class="posttest-card-position" aria-live="polite">Kartu {{ cardIndex() + 1 }}/{{ cards().length }} · {{ posttestCardSource(card) }}</p> }
+      <div class="carousel">
+        <button class="arrow" type="button" aria-label="Flashcard sebelumnya" (click)="nextCard(-1)">‹</button>
+        <article class="flip-card" [class.flipped]="flipped()" [class.learned]="learning.learnedIds().has(card.id)" (click)="flipped.set(!flipped())">
+          @if (learning.learnedIds().has(card.id)) { <span class="learned-mark">✓ Dipelajari</span> }
+          <div class="flip-inner">
+            <div class="face front">
+              @if (cardFormat() === 'image') {
+                <div class="picture"><div class="picture-person"><span></span><b>HI!</b></div></div>
+              } @else {
+                <div class="hanzi-front" lang="zh-Hans">{{ card.hanzi }}</div>
+              }
+              <small>Klik kartu untuk melihat kosakata</small>
+            </div>
+            <div class="face back">
+              <button class="audio" type="button" title="Putar audio Mandarin" aria-label="Putar audio Mandarin" [class.playing]="speakingCardId() === card.id" (click)="playCardAudio(card, $event)">&#128266;</button>
+              @if (cardFormat() === 'image') {
+                <strong lang="zh-Hans">{{ card.hanzi }}</strong>
+              }
+              <span>{{ card.pinyin }}</span><b>{{ card.meaning }}</b>
+              <button class="writing-button" type="button" title="Lihat urutan goresan" aria-label="Lihat urutan goresan" (click)="openStrokeOrder($event)">✎</button>
+            </div>
+          </div>
+        </article>
+        <button class="arrow" type="button" aria-label="Flashcard berikutnya" (click)="nextCard(1)">›</button>
+      </div>
+
+      <button class="learn-button" type="button" [disabled]="markingAllLearned()" [class.learned]="learning.learnedIds().has(card.id)" (click)="toggleCard()">
+        {{ learning.learnedIds().has(card.id) ? 'Batalkan tanda dipelajari' : 'Tandai sudah dipelajari' }}
+      </button>
+      @if (speechError()) { <p class="speech-message error" role="alert">{{ speechError() }}</p> }
+    }
+
+    @if (wordListOpen()) {
+      <div class="word-list">
+        <header><strong>Daftar Kosa Kata</strong><span>{{ cards().length }} kata</span></header>
+        <div class="word-list-rows">
+          @for (card of cards(); track card.id; let index = $index) {
+            <button [class.learned]="learning.learnedIds().has(card.id)" (click)="showCard(index)">
+              <b lang="zh-Hans">{{ card.hanzi }}</b>
+              <span><strong>{{ card.pinyin }}</strong><small>{{ card.meaning }}</small></span>
+              <i aria-hidden="true"></i>
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    @if (practiceError()) { <p class="speech-message error" role="alert">{{ practiceError() }}</p> }
+    <footer class="lesson-footer" [class.test-open]="canTest()" [class.test-locked]="!canTest()">
+      <div class="panda small"><app-mascot-display [variant]="canTest() ? 'quiz-terbuka' : 'quiz-terkunci'" /></div>
+      <p>
+        @if (posttestMode) {
+          Konfirmasi bahwa kamu sudah mempelajari materi untuk membuka posttest.
+          <strong class="test-status">{{ !posttest.loaded() ? 'Memuat riwayat posttest...' : canTest() ? 'Posttest siap dimulai' : 'Konfirmasi belajar di halaman posttest' }}</strong>
+        } @else {
+          Pelajari minimal 5 kosa kata untuk melakukan tes.
+          <small>{{ learnedCards().length }}/5 sudah dipelajari</small>
+          <strong class="test-status">{{ canTest() ? 'Tes siap dimulai' : 'Kumpulkan minimal 5 kosakata' }}</strong>
+        }
+      </p>
+      <button class="button" [disabled]="!canTest() || practiceLoading()" (click)="startTest()">{{ practiceLoading() ? 'Memuat soal...' : posttestMode ? posttest.session()?.status === 'completed' ? 'Lihat hasil posttest' : posttest.session() ? 'Lanjutkan posttest' : canTest() ? 'Mulai posttest' : 'Posttest terkunci' : canTest() ? 'Tes Terbuka' : 'Tes Terkunci' }}</button>
+    </footer>
+  </section>
+  </div>
+}
+
+@if (step() === 'test') {
+  @if (!posttestMode && answerCorrect()) {
+    <div class="star-celebration" aria-hidden="true">
+      @for (star of celebrationStars; track star) { <span><img src="assets/Star%20Icon.png" alt=""></span> }
+    </div>
+  }
+  <header class="page-header test-page-header">
+    <button class="student-back-button change-unit" type="button" [disabled]="practiceSavePending() || practiceAnswerSaving() || !!practiceAnswerLogError() || (posttestMode && (posttest.saving() || posttestSavePending()))" [title]="posttestMode ? 'Simpan dan kembali ke persiapan' : 'Kembali ke flashcard'" [attr.aria-label]="posttestMode ? 'Kembali ke persiapan posttest' : 'Kembali ke flashcard'" (click)="returnToCards()">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6-6-6 6 6 6" /></svg>
+    </button>
+    <div>
+      <h1>{{ posttestMode ? 'Posttest SD ' + posttest.grade() : unitDisplayName(selectedUnit()) }}</h1>
+      <p>{{ posttestMode ? 'Jawaban tersimpan setiap soal. Hasil ditampilkan setelah semua soal selesai.' : testLength() + ' soal campuran dari flashcard yang sudah dipelajari.' }}</p>
+    </div>
+  </header>
+  <div class="test-workspace" [class.posttest-workspace]="posttestMode">
+  <section class="panel test-panel">
+    <div class="test-stats">
+      <article class="question-progress">
+        <span>Soal</span>
+        <strong>{{ questionNumber() }}/{{ testLength() }}</strong>
+      </article>
+    </div>
+      <div class="question-box" [class.listening-question]="testCategory() === 'listening'" [class.speaking-question]="testCategory() === 'speaking'">
+      <header class="question-title">
+        <span class="question-type">{{ categoryLabel(testCategory()) }}</span>
+        <h2>{{ questionPrompt() }}</h2>
+      </header>
+
+      @if (testCategory() === 'writing') {
+        <div class="writing-practice" [class.single-character]="writingCharacters().length === 1">
+          <div class="writing-targets">
+            @for (character of writingCharacters(); track $index; let index = $index) {
+              <article [class.active]="writingActiveIndex() === index" [class.done]="writingCompleted().has(index)">
+                <div class="writing-stage" [id]="'writing-target-' + index" (pointerdown)="enableCorrectSound()"></div>
+                <small>Karakter {{ index + 1 }}</small>
+              </article>
+            }
+          </div>
+          <div class="writing-helper">
+            <span>{{ writingProgressLabel() }}</span>
+            <span>{{ writingStrokeTotal() }} total stroke</span>
+            <span>{{ writingMistakes() }} kesalahan goresan</span>
+            <span>{{ writingStrokeTotal() }} total goresan</span>
+          </div>
+          <p>{{ writingStatus() }}</p>
+        </div>
+      } @else {
+        @if (posttestMode && testCategory() === 'reading') {
+          <p class="posttest-passage" lang="zh-Hans">{{ testQuestion()?.passage }}</p>
+        }
+        @if (testCategory() !== 'listening' && (!posttestMode || testCategory() === 'speaking')) {
+          <div class="test-character"><span lang="zh-Hans">{{ testCard().hanzi }}</span> @if (!posttestMode && testCategory() !== 'speaking') { <small>{{ testCard().pinyin }}</small> }</div>
+        }
+
+        @if (testCategory() === 'speaking') {
+          <div class="speaking-answer">
+            <button class="microphone-button" type="button" [class.listening]="recognizingSpeech()" [disabled]="answered() || recognizingSpeech() || !speech.recognitionSupported" (click)="recordSpeakingAnswer()">
+              <span class="microphone-icon" aria-hidden="true"></span>
+              {{ recognizingSpeech() ? 'Sedang mendengarkan...' : answered() ? 'Ucapan sudah dinilai' : 'Tekan lalu ucapkan' }}
+            </button>
+            @if (!speech.recognitionSupported) {
+              <p class="speech-message error">Pengenalan suara tidak tersedia. Buka halaman ini melalui Chrome atau Edge terbaru.</p>
+            }
+            @if (speechError()) { <p class="speech-message error" role="alert">{{ speechError() }}</p> }
+          </div>
+        } @else {
+          @if (testCategory() === 'listening') {
+            <button class="listen-example" type="button" [disabled]="speakingCardId() !== null" (click)="playListeningAudio()"><span aria-hidden="true">&#128266;</span> {{ speakingCardId() ? 'Audio sedang diputar...' : 'Putar audio soal' }}</button>
+            @if (speechError()) { <p class="speech-message error" role="alert">{{ speechError() }}</p> }
+          }
+          <div class="choice-grid">@for (choice of choices(); track choice; let index = $index) { <button [disabled]="answered()" [attr.lang]="usesPretestListening() ? 'zh-Hans' : null" [class.correct]="!posttestMode && answered() && choice === correctChoice()" [class.incorrect]="!posttestMode && answered() && choice === selectedChoice() && choice !== correctChoice()" [class.posttest-selected]="posttestMode && choice === selectedChoice()" (click)="answer(choice)">@if (usesPretestListening() || posttestMode) { {{ 'ABCD'[index] }}. }{{ choice }}</button> }</div>
+        }
+      }
+
+      @if (feedback()) { <div class="feedback" [class.retry]="!posttestMode && !answerCorrect()"><div class="feedback-copy"><strong class="feedback-label">{{ posttestMode ? 'Posttest' : practiceQuestionSkipped() ? 'Soal dilewati' : answerCorrect() ? 'Jawaban benar' : 'Belum tepat' }}</strong><span>{{ feedback() }}</span></div></div> }
+      @if (practiceAnswerLogError()) { <p class="speech-message error" role="alert">{{ practiceAnswerLogError() }}</p><button class="button" type="button" [disabled]="practiceAnswerSaving()" (click)="retryPracticeAnswer()">{{ practiceAnswerSaving() ? 'Menyimpan jawaban...' : 'Coba simpan kembali' }}</button> }
+      @if (posttestMode && posttest.error()) { <p class="speech-message error" role="alert">{{ posttest.error() }}</p> }
+      @if (posttestMode && posttestSavePending() && !posttest.saving()) { <button class="button" (click)="retryPosttestSave()">Coba simpan lagi</button> }
+      @if (posttestMode && !answered()) { <button class="button secondary posttest-skip" [disabled]="recognizingSpeech() || speakingCardId() !== null" (click)="skipPosttestQuestion()">Tidak tahu / lewati soal (0)</button> }
+      @if (answered()) { <button class="button next" [disabled]="practiceSavePending() || practiceAnswerSaving() || !!practiceAnswerLogError() || (posttestMode && (posttest.saving() || posttestSavePending()))" (click)="nextQuestion()">{{ practiceAnswerSaving() ? 'Menyimpan jawaban...' : practiceSavePending() ? 'Menyimpan star...' : posttestMode && posttest.saving() ? 'Menyimpan jawaban...' : questionNumber() === testLength() ? 'Lihat Hasil' : 'Lanjut Soal' }}</button> }
+    </div>
+    @if (!posttestMode && !answered()) {
+      <button class="practice-skip" type="button" aria-label="Lewati soal, nilai 0 poin" title="Lewati soal dan dapatkan 0 poin" [disabled]="recognizingSpeech() || practiceAnswerSaving()" (click)="skipPracticeQuestion()">
+        <span>Lewati soal</span>
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 3.5 7.5 8 2 12.5v-9Zm6 0L13.5 8 8 12.5v-9Z"/><path d="M14.5 3.5v9"/></svg>
+      </button>
+    }
+    @if (!posttestMode && answered()) { <div class="test-result-mascot" aria-hidden="true"><app-mascot-display [variant]="answerCorrect() ? 'benar' : 'salah'" /></div> }
+  </section>
+  </div>
+}
+
+@if (posttestMode && step() === 'result') {
+  <section class="posttest-results">
+    <span class="posttest-eyebrow">SD {{ posttest.grade() }} · Posttest selesai</span><h1>Hasil posttest</h1>
+    <div class="posttest-result-score"><strong>{{ posttestScoreLabel(posttest.summary().earned) }}<small>/{{ posttest.summary().total }}</small></strong><span>Nilai {{ posttest.summary().percentage }}/100</span></div>
+    <div class="posttest-category-results">
+      @for (category of posttest.summary().categories; track category.category) { <article><span>{{ categoryLabel(category.category) }}</span><strong>{{ posttestScoreLabel(category.earned) }}/{{ category.total }}</strong></article> }
+    </div>
+    <p>Hasil dan jawabanmu sudah tersimpan. Nilai posttest terpisah dari poin latihan.</p>
+    <details class="posttest-answer-review">
+      <summary>Rincian jawaban {{ posttest.summary().total }} soal</summary>
+      <ol>
+        @for (answer of posttest.session()?.answers; track answer.questionId; let index = $index) {
+          <li><strong>{{ categoryLabel(answer.category) }} · {{ answer.category === 'writing' ? answer.skipped ? 'Dilewati' : answer.correct ? 'Benar' : (answer.earnedScore ?? 0) > 0 ? 'Parsial' : 'Belum tepat' : answer.correct ? 'Benar' : answer.skipped ? 'Dilewati' : 'Belum tepat' }}</strong>
+            <span>Jawaban: {{ answer.response || 'Tidak diisi' }}</span>
+            <span>Kunci: {{ posttest.session()?.plan?.[index]?.question?.correctAnswer }}</span>
+            @if (answer.category === 'writing') {
+              <span>Total stroke: {{ answer.writingTotalStrokes ?? 0 }} · Kesalahan: {{ answer.writingMistakes }}</span>
+              <span>Nilai soal: {{ posttestScoreLabel(answer.earnedScore ?? (answer.correct ? 1 : 0)) }}/1</span>
+            }
+          </li>
+        }
+      </ol>
+    </details>
+    <div class="result-actions"><a class="button" routerLink="../lesson">Kembali belajar</a></div>
+  </section>
+}
+
+@if (!posttestMode && step() === 'result') {
+  <section class="lesson-empty result-page">
+    <button class="student-back-button lesson-home-back" type="button" title="Kembali ke flashcard" aria-label="Kembali ke flashcard" (click)="returnToCards()">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6-6-6 6 6 6" /></svg>
+    </button>
+    <div class="panda"><app-mascot-display variant="benar" /></div><h1>Sesi selesai!</h1><p>Kamu mendapatkan <strong>{{ score() }} poin</strong> dari {{ testLength() }} soal.</p><div class="result-actions"><button class="button secondary" (click)="returnToCards()">Kembali Belajar</button></div>
+  </section>
+}
+
+@if (strokeMode()) {
+  <div class="modal-backdrop stroke-backdrop" (click)="closeStrokeOrder()">
+    <section class="modal-card stroke-modal" role="dialog" aria-modal="true" aria-labelledby="stroke-title" (click)="$event.stopPropagation()">
+      <header>
+        <div><h2 id="stroke-title">Urutan Goresan</h2><p class="muted"><span lang="zh-Hans">{{ activeCard().hanzi }}</span> · {{ activeCard().pinyin }}</p></div>
+        <button class="stroke-close" type="button" aria-label="Tutup" (click)="closeStrokeOrder()">&times;</button>
+      </header>
+      <div class="stroke-grid">
+        @for (character of strokeCharacters(); track $index) {
+          <article>
+            <div class="stroke-stage" [class.playing]="playingStroke() === $index">
+              <div class="stroke-target" [id]="'stroke-target-' + $index"></div>
+            </div>
+            <button class="stroke-play" type="button" [attr.aria-label]="'Putar urutan goresan ' + character" (click)="playStroke($index)">
+              <i aria-hidden="true"></i>
+            </button>
+          </article>
+        }
+      </div>
+    </section>
+  </div>
+}

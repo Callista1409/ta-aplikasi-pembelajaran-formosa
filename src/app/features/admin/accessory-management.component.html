@@ -1,0 +1,107 @@
+<header class="page-header accessory-page-header">
+  <div>
+    <p class="eyebrow">{{ dashboardLabel }}</p>
+    <h1>Manajemen Aksesoris</h1>
+    <p>Kelola kabinet, gambar preview, dan layer aksesoris maskot.</p>
+  </div>
+
+</header>
+@if (error() && !formOpen() && !pendingDelete()) { <p class="message error" role="alert">{{ error() }}</p> }
+@if (status()) { <p class="message success" role="status">{{ status() }}</p> }
+
+<section class="panel cabinet-section">
+  <div class="cabinet-toolbar">
+    <div>
+      <h2>Kabinet Aksesoris</h2>
+      <p class="muted">Aksesoris aktif dapat dibeli murid dengan saldo star yang cukup.</p>
+    </div>
+    <div class="cabinet-tools">
+      <span class="item-count">{{ items().length }} aksesoris</span>
+      <button class="button" type="button" [disabled]="saving()" (click)="openForm()">＋ Tambah Aksesoris</button>
+    </div>
+  </div>
+
+  <div class="admin-cabinet">
+    @for (item of items(); track item.id) {
+      <article class="admin-accessory-card" [class.is-inactive]="!item.active" [class.is-dragging]="draggingId() === item.id" [draggable]="!saving()" (dragstart)="startDrag(item.id)" (dragend)="endDrag()" (dragover)="$event.preventDefault()" (drop)="dropOn(item.id)">
+        <div class="admin-preview">
+          @if (item.previewUrl) {
+            <img [src]="item.previewUrl" [alt]="'Preview ' + item.name" />
+          } @else {
+            <span class="preview-placeholder"><img src="assets/Star%20Icon.png" alt=""></span>
+          }
+          <span class="status-chip" [class.inactive]="!item.active">{{ item.active ? 'Aktif' : 'Nonaktif' }}</span>
+        </div>
+        <div class="accessory-card-body">
+          <div class="accessory-card-heading">
+            <h3>{{ item.name }}</h3>
+            <span class="price-badge"><img class="star-icon" src="assets/Star%20Icon.png" alt=""> {{ item.price }}</span>
+          </div>
+          <p class="accessory-meta">{{ item.id }}</p>
+          <p class="drag-hint">⠿ Seret untuk mengubah urutan di kabinet ini</p>
+          <div class="accessory-actions">
+            <button class="button" type="button" [disabled]="saving()" (click)="openForm(item)">Edit</button>
+            <button class="button danger" type="button" [disabled]="saving()" (click)="requestDelete(item)">Hapus</button>
+          </div>
+          <button class="button secondary full-width" type="button" [disabled]="saving()" (click)="toggleActive(item)">
+            {{ item.active ? 'Nonaktifkan' : 'Aktifkan' }}
+          </button>
+        </div>
+      </article>
+    } @empty {
+      <div class="empty-state">
+        <span class="empty-icon"><img src="assets/Star%20Icon.png" alt=""></span>
+        <h3>Belum ada aksesoris</h3>
+        <p>Tambahkan aksesoris pertama untuk mengisi kabinet.</p>
+        <button class="button" type="button" [disabled]="saving()" (click)="openForm()">Tambah Aksesoris</button>
+      </div>
+    }
+  </div>
+</section>
+
+@if (formOpen()) {
+  <div class="modal-backdrop" role="presentation" (click)="closeForm()">
+    <section class="panel accessory-form-panel" role="dialog" aria-modal="true" aria-labelledby="accessory-form-title" (click)="$event.stopPropagation()">
+      <div class="form-panel-header">
+        <div>
+          <p class="eyebrow">{{ editingItem() ? 'Edit katalog' : 'Katalog baru' }}</p>
+          <h2 id="accessory-form-title">{{ editingItem() ? 'Edit Aksesoris' : 'Tambah Aksesoris' }}</h2>
+        </div>
+        <button class="icon-button" type="button" aria-label="Tutup formulir" title="Tutup" (click)="closeForm()">×</button>
+      </div>
+      <fieldset class="accessory-fields" [disabled]="saving()">
+      <div class="form-grid">
+        <label class="field">ID unik<input [(ngModel)]="form.id" [readOnly]="!!editingItem()" placeholder="ribbon-pink"></label>
+        <label class="field">Nama<input [(ngModel)]="form.name" placeholder="Pita Pink"></label>
+        <label class="field">Harga star<input type="number" min="0" step="1" [(ngModel)]="form.price"></label>
+      </div>
+      <div class="upload-grid">
+        <label class="upload-box"><strong>Gambar preview kabinet</strong><small>JPG, PNG, WebP · maksimal 1 MB</small><input type="file" accept="image/png,image/jpeg,image/webp" (change)="choosePreview($event)"><span>{{ previewName }}</span>@if (editingItem()?.previewUrl) { <img class="current-image" [src]="editingItem()!.previewUrl" alt="Preview saat ini"> }</label>
+        <label class="upload-box"><strong>Gambar layer aksesoris</strong><small>PNG/WebP transparan · tepat 2000 × 2000 px · maksimal 1 MB</small><input type="file" accept="image/png,image/webp" (change)="chooseAccessory($event)"><span>{{ accessoryName }}</span>@if (editingItem()?.accessoryUrl) { <img class="current-image" [src]="editingItem()!.accessoryUrl" alt="Layer saat ini"> }</label>
+      </div>
+      <label class="check-field"><input type="checkbox" [(ngModel)]="form.active"> Aktif di katalog murid</label>
+      @if (editingItem()) { <p class="muted">Gambar tidak perlu diunggah ulang jika tidak diganti. ID tetap agar kepemilikan murid tidak berubah.</p> }
+      </fieldset>
+      @if (error()) { <p class="message error" role="alert">{{ error() }}</p> }
+      @if (status()) { <p class="message success">{{ status() }}</p> }
+      <div class="form-actions">
+        <button class="button secondary" type="button" [disabled]="saving()" (click)="closeForm()">Batal</button>
+        <button class="button" type="button" [disabled]="saving()" (click)="save()">{{ saving() ? 'Menyimpan...' : editingItem() ? 'Simpan Perubahan' : 'Simpan Aksesoris' }}</button>
+      </div>
+    </section>
+  </div>
+}
+
+@if (pendingDelete(); as item) {
+  <div class="modal-backdrop" (click)="closeDelete()">
+    <section class="panel accessory-delete-panel" role="dialog" aria-modal="true" aria-labelledby="delete-accessory-title" (click)="$event.stopPropagation()">
+      <h2 id="delete-accessory-title">Hapus {{ item.name }}?</h2>
+      <p>Aksesoris ini tidak akan tampil lagi di katalog atau pada maskot. Riwayat pembelian dan poin murid tidak diubah.</p>
+      @if (error()) { <p class="message error" role="alert">{{ error() }}</p> }
+      <div class="form-actions">
+        <button class="button secondary" type="button" [disabled]="saving()" (click)="closeDelete()">Batal</button>
+        <button class="button danger" type="button" [disabled]="saving()" (click)="deleteAccessory()">{{ saving() ? 'Menghapus...' : 'Hapus Aksesoris' }}</button>
+      </div>
+    </section>
+  </div>
+}

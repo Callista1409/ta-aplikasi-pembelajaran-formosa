@@ -1,0 +1,25 @@
+.level-grid { display: grid; grid-template-columns: repeat(3, minmax(220px, 1fr)); gap: 14px; max-height: min(68vh, 720px); overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; padding: 0 6px 4px 0; }
+.level-card { display: grid; align-content: start; gap: 9px; border: 1px solid var(--line); border-left: 4px solid var(--brand); border-radius: 8px; padding: 14px; background: #fffafa; }
+.level-card h2 { margin-bottom: 2px; font-size: 18px; }
+.unit-row { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 8px; width: 100%; border: 1px solid var(--line); border-radius: 7px; padding: 10px; color: var(--ink); background: #fff; text-align: left; }
+.unit-row.selected { border-color: var(--brand); background: var(--brand-soft); }
+.unit-row strong, .unit-row small { display: block; }
+.unit-row small { margin-top: 4px; color: var(--muted); }
+.unit-actions { display: flex; gap: 6px; }
+.unit-actions .icon-button { width: 32px; height: 32px; }
+.unit-detail-header { display: flex; justify-content: space-between; align-items: start; gap: 14px; margin-bottom: 16px; }
+.unit-detail-header h2 { margin-bottom: 4px; }
+.unit-detail-header p { margin-bottom: 0; color: var(--muted); }
+.unit-flashcards { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; max-height: min(52vh, 540px); overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; padding: 2px 6px 4px 0; }
+.unit-flashcards div { display: grid; gap: 4px; border: 1px solid var(--line); border-radius: 8px; padding: 12px; }
+.unit-flashcards b { font-size: 24px; }
+.unit-flashcards small { color: var(--muted); }
+.form-error { margin: 0 0 12px; color: #9b3f3f; font-weight: 700; }
+@media (max-width: 900px) { .level-grid { grid-template-columns: 1fr; } .unit-detail-header { display: grid; } }
+
+@media (max-width: 430px) {
+  .level-card { padding:12px; }
+  .unit-row { grid-template-columns: 1fr; }
+  .unit-actions { justify-content:flex-start; }
+  .unit-flashcards { grid-template-columns:1fr; }
+}

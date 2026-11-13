@@ -1,0 +1,182 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function currentUser() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function writableAccount() {
+      return signedIn() && currentUser().get('active', true) != false
+        && !(currentUser().get('deletionStatus', '') in ['deleting', 'failed']);
+    }
+
+    function role() {
+      return writableAccount() ? currentUser().role : null;
+    }
+
+    function isAdmin() {
+      return role() == 'admin';
+    }
+
+    function isTeacher() {
+      return role() == 'teacher';
+    }
+
+    function isStudent() {
+      return role() == 'student';
+    }
+
+    match /users/{userId} {
+      allow read: if signedIn() && (
+        isAdmin()
+        || request.auth.uid == userId
+        || (isTeacher() && resource.data.role in ['student', 'teacher'])
+      );
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /loginUsernames/{username} {
+      allow get: if true;
+      allow list: if false;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /pendingRegistrations/{uid} {
+      allow create: if signedIn()
+        && request.auth.uid == uid
+        && !exists(/databases/$(database)/documents/accountDeletionJobs/$(uid))
+        && request.resource.data.status == 'pending'
+        && request.resource.data.role in ['student', 'teacher']
+        && (request.resource.data.role == 'teacher' || request.resource.data.grade is int)
+        && request.resource.data.email == request.auth.token.email;
+      allow get: if signedIn() && (
+        request.auth.uid == uid || isAdmin()
+      );
+      allow list: if signedIn() && isAdmin();
+      allow update: if isAdmin()
+        || (signedIn()
+          && request.auth.uid == uid
+          && resource.data.status == 'pending'
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['emailVerified', 'updatedAt']));
+      allow delete: if isAdmin();
+    }
+
+    match /contentMetadata/{metadataId} {
+      allow get: if signedIn() && metadataId == 'catalog';
+      allow list: if false;
+      allow create: if (isAdmin() || isTeacher()) && metadataId == 'catalog'
+        && request.resource.data.keys().hasOnly(['revision', 'updatedAt'])
+        && request.resource.data.revision == 1
+        && request.resource.data.updatedAt == request.time;
+      allow update: if (isAdmin() || isTeacher()) && metadataId == 'catalog'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['revision', 'updatedAt'])
+        && request.resource.data.revision == resource.data.revision + 1
+        && request.resource.data.updatedAt == request.time;
+    }
+
+    match /units/{unitId} {
+      allow read: if signedIn();
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /flashcards/{flashcardId} {
+      allow read: if signedIn();
+      allow create, update, delete: if isAdmin() || isTeacher();
+    }
+
+    match /questions/{questionId} {
+      allow read: if signedIn();
+      allow create, update, delete: if isAdmin() || isTeacher();
+    }
+
+    match /questionPointRules/{ruleId} {
+      allow read: if signedIn();
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /levelRules/{ruleId} {
+      allow read: if signedIn();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Financial/assessment data is written by the authenticated Student API.
+    // Admin SDK bypasses these client rules; authorization lives in its transactions.
+    match /studentPoints/{studentId} {
+      allow read: if signedIn() && (isAdmin() || isTeacher() || request.auth.uid == studentId);
+      allow write: if isAdmin();
+    }
+
+    match /studentProgress/{documentId} {
+      allow read: if signedIn() && (isAdmin() || isTeacher() || resource.data.studentId == request.auth.uid);
+      allow write: if isAdmin();
+    }
+
+    match /studentQuestionProgress/{documentId} {
+      allow read: if signedIn() && (isAdmin() || isTeacher() || resource.data.studentId == request.auth.uid);
+      allow write: if isAdmin();
+    }
+
+    match /studentPracticeSessions/{documentId} {
+      allow read: if signedIn() && (isAdmin() || isTeacher() || resource.data.studentId == request.auth.uid);
+      allow write: if isAdmin();
+    }
+
+    match /studentPracticeAnswerEvents/{documentId} {
+      allow read: if signedIn() && (isAdmin() || isTeacher() || resource.data.studentId == request.auth.uid);
+      allow write: if isAdmin();
+    }
+
+    match /testSessions/{documentId} {
+      allow read: if signedIn() && (isAdmin() || isTeacher() || resource.data.studentId == request.auth.uid);
+      allow write: if isAdmin();
+    }
+
+    match /testAnswers/{documentId} {
+      allow read: if signedIn() && (isAdmin() || isTeacher() || resource.data.studentId == request.auth.uid);
+      allow write: if isAdmin();
+    }
+
+    match /studentActivityLogs/{documentId} {
+      allow read: if signedIn() && (isAdmin() || isTeacher() || resource.data.studentId == request.auth.uid);
+      allow write: if isAdmin();
+    }
+
+    match /studentComments/{commentId} {
+      allow read: if signedIn() && (
+        isAdmin() || isTeacher() || resource.data.studentId == request.auth.uid
+      );
+      allow create: if isTeacher() && request.resource.data.teacherId == request.auth.uid
+        && get(/databases/$(database)/documents/users/$(request.resource.data.studentId)).data.role == 'student'
+        && get(/databases/$(database)/documents/users/$(request.resource.data.studentId)).data.get('active', true) != false
+        && !(get(/databases/$(database)/documents/users/$(request.resource.data.studentId)).data.get('deletionStatus', '') in ['deleting', 'failed']);
+      allow update: if isTeacher()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['readAt']);
+      allow delete: if isTeacher() && resource.data.teacherId == request.auth.uid;
+    }
+
+    match /accessories/{accessoryId} {
+      allow read: if signedIn();
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /studentAccessories/{documentId} {
+      allow read: if signedIn() && (isAdmin() || resource.data.studentId == request.auth.uid);
+      allow write: if isAdmin();
+    }
+
+    match /activityLogs/{logId} {
+      allow read: if signedIn() && (isAdmin() || isTeacher());
+      allow create: if isAdmin() || isTeacher();
+      allow update, delete: if isAdmin();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,95 @@
+<section class="page-header">
+  <div>
+    <p class="eyebrow">Manajemen Akun</p>
+    <h1>Pendaftaran Akun</h1>
+    <p>Periksa email dan data calon murid sebelum memberikan akses belajar.</p>
+  </div>
+  <span class="count-badge">{{ pendingCount() }} menunggu persetujuan</span>
+</section>
+
+<section class="panel registration-layout">
+  <div class="registration-list">
+    <div class="list-heading">
+      <strong>Daftar Pendaftar</strong>
+      <span>{{ visibleRegistrations().length }} dari {{ registrations().length }} akun</span>
+    </div>
+
+    <label class="status-filter">
+      <span>Status pendaftaran</span>
+      <select [ngModel]="statusFilter()" (ngModelChange)="setStatusFilter($event); registrationScroll.scrollTop = 0">
+        @for (option of statusOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+    </label>
+    <div #registrationScroll class="registration-scroll" tabindex="0" role="region" aria-label="Daftar pendaftar, gulir untuk melihat akun lainnya">
+    @if (!visibleRegistrations().length) {
+      <div class="empty-state">
+        <strong>{{ registrations().length ? 'Tidak ada akun dengan status ini' : 'Belum ada pendaftaran' }}</strong>
+        <p>{{ registrations().length ? 'Pilih filter lain untuk melihat pendaftar.' : 'Akun baru akan muncul di sini setelah user mengisi form pendaftaran.' }}</p>
+      </div>
+    } @else {
+      @for (registration of visibleRegistrations(); track registration.uid) {
+        <article class="registration-row" [class.selected]="selected()?.uid === registration.uid" (click)="select(registration)">
+          <div>
+            <strong>{{ registration.displayName }}</strong>
+            <span>{{ registration.email }}</span>
+          </div>
+          <span class="account-role">{{ registration.role === 'student' ? 'Murid · SD ' + registration.grade : 'Guru' }}</span>
+          <span class="status">Email tercatat</span>
+          <span class="status status-state" [class.approved]="registration.status === 'approved'" [class.rejected]="registration.status === 'rejected'">
+            {{ statusLabel(registration.status) }}
+          </span>
+        </article>
+      }
+    }
+    </div>
+  </div>
+
+  @if (selected(); as registration) {
+    <aside class="registration-detail" aria-label="Detail pendaftar">
+      <p class="eyebrow">Detail Pendaftar</p>
+      <h2>{{ registration.displayName }}</h2>
+      <dl>
+        <div><dt>Email</dt><dd>{{ registration.email }}</dd></div>
+        <div><dt>Jenis akun</dt><dd>{{ registration.role === 'student' ? 'Murid' : 'Guru' }}</dd></div>
+        @if (registration.role === 'student') {
+          <div><dt>Kelas</dt><dd>SD {{ registration.grade }}</dd></div>
+        }
+        <div><dt>Status</dt><dd>{{ statusLabel(registration.status) }}</dd></div>
+      </dl>
+
+      @if (actionError()) {
+        <p class="form-error" role="alert">{{ actionError() }}</p>
+      }
+
+      @if (registration.status === 'pending') {
+        <label class="username-field">
+          <span>Username untuk login</span>
+          <input type="text" name="registrationUsername" placeholder="Contoh: emily2018" [(ngModel)]="username" [disabled]="savingUid() === registration.uid">
+        </label>
+        <button class="button success" type="button" [disabled]="savingUid() === registration.uid" (click)="assignUsername(registration)">
+          {{ savingUid() === registration.uid ? 'Menyimpan...' : 'Simpan Username & Setujui' }}
+        </button>
+        <div class="detail-actions">
+          <button class="button danger" type="button" [disabled]="savingUid() === registration.uid" (click)="updateStatus(registration, 'rejected')">Tolak</button>
+        </div>
+      } @else {
+        <p class="muted">Username sudah disimpan dan akun sudah disetujui.</p>
+        @if (registration.username) {
+          <div class="username-summary">
+            <span>Username</span>
+            <strong>{{ registration.username }}</strong>
+          </div>
+          <button class="button secondary" type="button" (click)="sendUsernameEmail(registration)">Buka Draft Gmail</button>
+          <p class="mail-note">Draft Gmail akan terbuka. Tekan tombol Kirim setelah memeriksanya.</p>
+        }
+      }
+    </aside>
+  } @else {
+    <aside class="registration-detail empty-detail">
+      <strong>Pilih pendaftar</strong>
+      <p>Klik salah satu nama untuk melihat rincian akun.</p>
+    </aside>
+  }
+</section>

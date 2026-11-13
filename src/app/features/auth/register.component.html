@@ -1,0 +1,85 @@
+<main class="register-page">
+  <section class="register-intro" aria-labelledby="register-title">
+    <div class="brand-mark">F</div>
+    <div>
+      <p class="eyebrow">Formosa Mandarin</p>
+      <h1 id="register-title">Buat akun belajar</h1>
+      <p>Daftarkan email kamu untuk mendapatkan akses belajar setelah disetujui admin.</p>
+    </div>
+    <img src="assets/panda_default.PNG" alt="Maskot panda Formosa">
+  </section>
+
+  <section class="register-form" aria-label="Form pendaftaran akun">
+    @if (success()) {
+      <div class="success-state" role="status">
+        <h2>Pendaftaran berhasil</h2>
+        <p>Data kamu sudah diterima dan sedang menunggu persetujuan admin.</p>
+        <div class="verification-check">
+          <h3>Apa yang dilakukan selanjutnya?</h3>
+          <p>Admin akan memeriksa data kamu, membuat username, lalu mengirimkannya ke email yang kamu daftarkan.</p>
+        </div>
+        <a class="button" routerLink="/login">Kembali ke Login</a>
+      </div>
+    } @else {
+      <header>
+        <h2>Daftar Akun</h2>
+        <p>Isi data berikut dengan email yang bisa kamu buka.</p>
+      </header>
+
+      <form (ngSubmit)="submit()">
+        <label>
+          <span>Nama lengkap</span>
+          <input type="text" name="displayName" autocomplete="name" placeholder="Contoh: Emily" [(ngModel)]="displayName" [disabled]="submitting()">
+        </label>
+
+        <label>
+          <span>Email</span>
+          <input type="email" name="email" autocomplete="email" placeholder="nama@email.com" [(ngModel)]="email" [disabled]="submitting()">
+        </label>
+
+        <label>
+          <span>Jenis akun</span>
+          <select name="role" [(ngModel)]="role" [disabled]="submitting()">
+            <option value="student">Murid</option>
+            <option value="teacher">Guru</option>
+          </select>
+        </label>
+
+        @if (role === 'student') {
+        <label>
+          <span>Kelas</span>
+          <select name="grade" [(ngModel)]="grade" [disabled]="submitting()">
+            @for (value of [1, 2, 3, 4, 5, 6]; track value) {
+              <option [ngValue]="value">SD {{ value }}</option>
+            }
+          </select>
+        </label>
+        }
+
+        <label>
+          <span>Password</span>
+          <input [type]="showPassword ? 'text' : 'password'" name="password" autocomplete="new-password" placeholder="Minimal 6 karakter" [(ngModel)]="password" [disabled]="submitting()">
+        </label>
+
+        <label>
+          <span>Konfirmasi password</span>
+          <input [type]="showPassword ? 'text' : 'password'" name="confirmPassword" autocomplete="new-password" placeholder="Ulangi password" [(ngModel)]="confirmPassword" [disabled]="submitting()">
+        </label>
+
+        <label class="show-password">
+          <input type="checkbox" name="showPassword" [(ngModel)]="showPassword">
+          <span>Tampilkan password</span>
+        </label>
+
+        @if (errorMessage()) {
+          <p class="form-error" role="alert">{{ errorMessage() }}</p>
+        }
+
+        <button class="button" type="submit" [disabled]="submitting()">
+          {{ submitting() ? 'Mendaftarkan...' : 'Daftar Akun' }}
+        </button>
+        <a class="login-link" routerLink="/login">Sudah punya akun? Kembali ke login</a>
+      </form>
+    }
+  </section>
+</main>

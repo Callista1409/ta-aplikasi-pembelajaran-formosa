@@ -1,0 +1,29 @@
+<div class="app-shell" [class.student-shell]="roleLabel === 'Murid'">
+  <aside class="sidebar" [class.menu-open]="menuOpen()">
+    <a class="identity" routerLink="profile" routerLinkActive="identity-active" aria-label="Buka profil akun" (click)="closeMenu()">
+      <span class="avatar">{{ initials() }}</span>
+      <div>
+        <strong>{{ userName() }}</strong>
+        <small>{{ consoleLabel }}</small>
+      </div>
+    </a>
+
+    <button #menuToggle class="menu-toggle" type="button" aria-controls="role-navigation"
+      [attr.aria-expanded]="menuOpen()" (click)="menuOpen.set(!menuOpen())">
+      <span aria-hidden="true">{{ menuOpen() ? '×' : '☰' }}</span>
+      {{ menuOpen() ? 'Tutup' : 'Menu' }}
+    </button>
+
+    <nav id="role-navigation" [attr.aria-label]="'Menu ' + roleLabel">
+      @for (item of navigation; track item.path) {
+        <a [routerLink]="item.path" routerLinkActive="active" ariaCurrentWhenActive="page" (click)="closeMenu(true)">{{ item.label }}</a>
+      }
+    </nav>
+
+    <button class="logout" type="button" (click)="logout()">Log out</button>
+  </aside>
+
+  <main class="content">
+    <router-outlet />
+  </main>
+</div>

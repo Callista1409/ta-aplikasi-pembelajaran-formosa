@@ -1,0 +1,180 @@
+<header class="page-heading">
+  <p>{{ dashboardLabel }}</p>
+  <h1>{{ pageTitle }}</h1>
+  <span>{{ pageSubtitle }}</span>
+</header>
+
+<section class="period-panel compact-period" aria-label="Filter periode poin murid">
+  <div>
+    <h2>Filter Tanggal</h2>
+    <p>Daftar dan detail mengikuti rentang tanggal yang dipilih.</p>
+  </div>
+  <div class="period-filters">
+    <label><span>Tanggal mulai</span><input type="date" [ngModel]="startDateId()" (ngModelChange)="changeStartDate($event)" /></label>
+    <label><span>Tanggal akhir</span><input type="date" [ngModel]="endDateId()" (ngModelChange)="changeEndDate($event)" /></label>
+  </div>
+</section>
+
+@if (dataWarning()) {
+  <p class="warning">{{ dataWarning() }}</p>
+}
+
+<section class="tracking-grid">
+  <article class="panel student-list">
+    <div class="panel-heading">
+      <div>
+        <h2>Daftar Poin Murid</h2>
+        <p>Klik murid untuk melihat detailnya.</p>
+      </div>
+    </div>
+
+    <div class="student-table" role="list">
+      <div class="table-head" aria-hidden="true">
+        <span>Nama</span>
+        <span>Kelas</span>
+        <span>Periode</span>
+        <span>Total</span>
+      </div>
+
+      @for (student of summaries(); track student.id) {
+        <div class="student-row-wrap">
+          <button
+            type="button"
+            class="student-row"
+            [class.active]="student.id === selectedStudentId()"
+            (click)="selectStudent(student.id)"
+          >
+            <span>
+              <strong>{{ student.name }}</strong>
+              <small>{{ student.questionCount }} soal di periode ini</small>
+            </span>
+            <b>SD {{ student.grade || '-' }}</b>
+            <b>{{ student.periodPoints }} poin</b>
+            <b>{{ student.totalPoints }} poin</b>
+          </button>
+          <button class="comment-button" type="button" title="Buka komentar murid" (click)="openComments(student.id)">
+            <span aria-hidden="true">&#128172;</span>
+            @if (commentCount(student.id)) { <b>{{ commentCount(student.id) }}</b> }
+          </button>
+        </div>
+      } @empty {
+        <p class="empty">Belum ada akun murid.</p>
+      }
+    </div>
+  </article>
+
+  <article class="panel detail-panel">
+    @if (selectedSummary(); as summary) {
+      <div class="detail-heading">
+        <div>
+          <p>Detail Murid</p>
+          <h2>{{ summary.name }}</h2>
+          <span>SD {{ summary.grade || '-' }}</span>
+        </div>
+        <strong>{{ summary.periodPoints }} poin periode ini</strong>
+      </div>
+
+      <div class="mini-stats">
+        <article>
+          <span>Total Poin</span>
+          <strong>{{ summary.totalPoints }}</strong>
+        </article>
+        <article>
+          <span>Poin Periode</span>
+          <strong>{{ summary.periodPoints }}</strong>
+        </article>
+        <article>
+          <span>Soal Periode Ini</span>
+          <strong>{{ periodDetail().questionCount }}</strong>
+        </article>
+        <article>
+          <span>Kosakata Periode Ini</span>
+          <strong>{{ periodDetail().learnedCount }}</strong>
+        </article>
+      </div>
+
+      <section class="progress-detail" aria-label="Ringkasan progress murid">
+        <div>
+          <h3>Progress Belajar</h3>
+          <p>Aktivitas murid pada rentang tanggal yang dipilih.</p>
+        </div>
+        <div class="progress-cards">
+          <span><b>{{ periodDetail().learnedCount }}</b>Kosa kata dipelajari</span>
+          <span><b>{{ periodDetail().questionCount }}</b>Soal dikerjakan</span>
+          <span><b>{{ periodDetail().earnedPoints }}</b>Poin periode ini</span>
+        </div>
+      </section>
+
+      <section class="category-box" aria-label="Kategori soal periode ini">
+        <h3>Aktivitas Periode Ini</h3>
+        <div>
+          @for (item of periodDetail().categories; track item.label) {
+            <span><b>{{ item.label }}</b>{{ item.value }} soal</span>
+          }
+        </div>
+      </section>
+
+      @if (commentStudentId(); as studentId) {
+        <section class="comments-section" aria-label="Komentar murid">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Catatan Belajar</p>
+              <h3>Komentar Murid</h3>
+              <p>{{ studentNameFor(studentId) }}</p>
+            </div>
+          </div>
+          <div class="comment-list">
+            @for (comment of commentsForStudent(studentId); track comment.id) {
+              <article class="comment-item">
+                <div class="comment-item-heading">
+                  <span><strong>{{ comment.teacherName }}</strong><time>{{ comment.commentDate }}</time></span>
+                  <button
+                    class="comment-note-button"
+                    type="button"
+                    [class.is-noted]="comment.readAt"
+                    [disabled]="!!comment.readAt"
+                    (click)="markCommentAsNoted(comment.id)"
+                  >
+                    {{ comment.readAt ? 'Sudah dinot' : 'Tandai sudah dinot' }}
+                  </button>
+                </div>
+                <p>{{ comment.comment }}</p>
+              </article>
+            } @empty {
+              <p class="empty">Belum ada komentar untuk murid ini.</p>
+            }
+          </div>
+          <div class="comment-form">
+            <button class="button secondary" type="button" (click)="openComments(summary.id)">Tambah komentar</button>
+          </div>
+        </section>
+      }
+    } @else {
+      <div class="empty detail-empty">
+        <h2>Pilih murid terlebih dahulu</h2>
+        <p>Detail progress akan muncul di sini setelah salah satu nama murid diklik.</p>
+      </div>
+    }
+  </article>
+</section>
+
+@if (commentComposerStudentId(); as studentId) {
+  <div class="comment-modal-backdrop" role="presentation" (click)="closeComments()">
+    <article class="comment-modal" role="dialog" aria-modal="true" aria-labelledby="comment-title" (click)="$event.stopPropagation()">
+      <div class="panel-heading">
+        <div>
+          <p class="eyebrow">Catatan Belajar</p>
+          <h2 id="comment-title">Tambah Komentar</h2>
+          <p>{{ studentNameFor(studentId) }}</p>
+        </div>
+        <button class="button secondary" type="button" (click)="closeComments()">Tutup</button>
+      </div>
+      <form class="comment-form" (ngSubmit)="addComment()">
+        <label><span>Tanggal</span><input type="date" name="commentDate" [(ngModel)]="commentDate" [disabled]="savingComment()"></label>
+        <label><span>Komentar</span><textarea name="commentText" rows="3" placeholder="Tulis komentar untuk murid..." [(ngModel)]="commentText" [disabled]="savingComment()"></textarea></label>
+        @if (commentError()) { <p class="warning" role="alert">{{ commentError() }}</p> }
+        <button class="button" type="submit" [disabled]="savingComment()">{{ savingComment() ? 'Menyimpan...' : 'Tambah Komentar' }}</button>
+      </form>
+    </article>
+  </div>
+}

@@ -1,0 +1,484 @@
+.shop-header {
+  display: flex;
+  align-items: start;
+  gap: 24px;
+  width: 100%;
+  margin: 0 0 30px;
+}
+
+.shop-header .shop-title { text-align: left; }
+.shop-header .point-badge { margin-left: auto; }
+
+.eyebrow {
+  margin-bottom: 10px;
+  color: var(--brand);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(30px, 4vw, 40px);
+}
+
+.point-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 86px;
+  height: 36px;
+  border: 1px solid #1f1f1f;
+  border-radius: 4px;
+  color: #111;
+  background: #fff;
+  font-size: 17px;
+  font-weight: 900;
+}
+
+.point-badge .star-icon { display:block; width:20px; height:20px; object-fit:contain; }
+
+.mascot-shop {
+  display: grid;
+  grid-template-columns: minmax(360px, 420px) minmax(0, 1fr);
+  align-items: start;
+  gap: clamp(28px, 4vw, 52px);
+  width: 100%;
+  margin-inline: 0;
+  margin-top: 32px;
+}
+
+.mascot-area {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+}
+
+.panda-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  max-width: 420px;
+  aspect-ratio: 1;
+}
+
+.panda-stage::after {
+  content: '';
+  position: absolute;
+  right: 18%;
+  bottom: 8%;
+  left: 18%;
+  height: 18px;
+  border-radius: 50%;
+  background: rgb(44 31 28 / 13%);
+  filter: blur(7px);
+  pointer-events: none;
+}
+
+.wardrobe-caption {
+  display: grid;
+  gap: 4px;
+  max-width: 300px;
+  text-align: center;
+}
+
+.wardrobe-caption strong { color: var(--ink); font-size: 17px; }
+.wardrobe-caption span { color: var(--muted); font-size: 12px; line-height: 1.4; }
+
+.panda-stage img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.equipped-glasses {
+  position: absolute;
+  top: 34%;
+  left: 50%;
+  width: 118px;
+  height: 42px;
+  transform: translateX(-50%) rotate(-2deg);
+  pointer-events: none;
+}
+
+.equipped-glasses::before,
+.equipped-glasses::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  width: 48px;
+  height: 31px;
+  border-radius: 8px 8px 14px 14px;
+  background: #111;
+}
+
+.equipped-glasses::before {
+  left: 0;
+}
+
+.equipped-glasses::after {
+  right: 0;
+}
+
+.equipped-glasses {
+  border-top: 6px solid #111;
+}
+
+.accessory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 130px), 1fr));
+  gap: 14px;
+}
+
+.accessory-card {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  min-width: 0;
+  min-height: 198px;
+  border: 1px solid #8f8f8f;
+  border-radius: 5px;
+  padding: 18px 14px 16px;
+  background: #fff;
+  box-shadow: 0 2px 0 rgb(44 31 28 / 5%);
+  transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease, background .16s ease;
+}
+
+.accessory-card:hover {
+  border-color: #b47c74;
+  box-shadow: 0 8px 16px rgb(79 42 37 / 12%);
+  transform: translateY(-4px);
+}
+
+.accessory-card:focus-within {
+  outline: 3px solid rgb(152 73 67 / 18%);
+  outline-offset: 2px;
+}
+
+.accessory-card.is-equipped {
+  border: 2px solid #2f8f7a;
+  background: #effaf6;
+  box-shadow: 0 5px 14px rgb(47 143 122 / 15%);
+}
+
+.accessory-card.is-purchased {
+  border: 2px solid #4d8ed8;
+  background: #eff6ff;
+}
+
+.accessory-card.is-previewing {
+  border-color: #d28b25;
+  background: #fffaf0;
+  box-shadow: 0 0 0 3px #ffe6ae, 0 8px 18px rgb(210 139 37 / 18%);
+  transform: translateY(-3px);
+}
+
+.accessory-card.is-unowned {
+  border-color: #b9b9b9;
+  background: #fbfbfb;
+}
+
+.accessory-icon {
+  display: grid;
+  place-items: center;
+  width: min(122px, 100%);
+  aspect-ratio: 1;
+  height: auto;
+  overflow: hidden;
+  background: transparent;
+}
+
+.accessory-icon img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Each source canvas has a different transparent margin, so its crop is tuned separately. */
+.accessory-icon.accessory-ribbon img {
+  width: 375%;
+  height: 375%;
+  transform: translate(22%, 28%);
+}
+
+.accessory-icon.accessory-leaf img {
+  width: 170%;
+  height: 170%;
+  transform: translate(4%, 22%);
+}
+
+.accessory-icon.accessory-glasses img,
+.accessory-icon.accessory-blackglasses img {
+  width: 135%;
+  height: 135%;
+}
+
+.accessory-icon.accessory-mask img,
+.accessory-icon.accessory-hat img,
+.accessory-icon.accessory-crown img,
+.accessory-icon.accessory-star img,
+.accessory-icon.accessory-starclip img {
+  width: 145%;
+  height: 145%;
+}
+
+.accessory-icon.preview-asset img {
+  width: 100%;
+  height: 100%;
+  transform: none;
+  object-fit: contain;
+}
+
+.accessory-name {
+  width: 100%;
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.2;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.price {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 54px;
+  border: 1px solid #cfcfcf;
+  border-radius: 3px;
+  padding: 3px 8px;
+  color: #111;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 900;
+}
+.price .star-icon { display:block; width:16px; height:16px; object-fit:contain; }
+
+.accessory-card .price {
+  margin-top: 2px;
+}
+
+.buy-button {
+  margin-top: 2px;
+  width: 98px;
+  min-height: 28px;
+  border-radius: 5px;
+  color: #777;
+  background: #ececec;
+  font-weight: 800;
+  transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+}
+
+.buy-button:not(:disabled):hover { filter: brightness(.96); box-shadow: 0 3px 0 rgb(44 31 28 / 16%); transform: translateY(-1px); }
+.buy-button:not(:disabled):active { box-shadow: 0 1px 0 rgb(44 31 28 / 16%); transform: translateY(1px) scale(.98); }
+
+.preview-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  min-height: 0;
+  border: 1px solid #cfcfcf;
+  border-radius: 50%;
+  padding: 0;
+  color: #555;
+  background: #fff;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.preview-button:hover,
+.preview-button.previewing {
+  border-color: var(--brand);
+  color: var(--brand-dark);
+  background: var(--brand-soft);
+}
+
+.preview-button { transition: transform .15s ease, box-shadow .15s ease, background .15s ease; }
+.preview-button:hover { box-shadow: 0 3px 7px rgb(44 31 28 / 14%); transform: scale(1.08); }
+
+.buy-button:not(:disabled):not(.installed) {
+  color: #fff;
+  background: #4d8ed8;
+}
+
+.accessory-card.is-unowned .buy-button:not(:disabled) {
+  background: #d08b25;
+}
+
+.buy-button.installed {
+  color: #fff;
+  background: #2f8f7a;
+}
+
+.buy-button:disabled {
+  cursor: not-allowed;
+  opacity: .72;
+}
+
+.glasses-shape {
+  position: relative;
+  width: 74px;
+  height: 30px;
+  border-top: 6px solid #000;
+}
+
+.glasses-shape::before,
+.glasses-shape::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  width: 30px;
+  height: 22px;
+  border-radius: 5px 5px 12px 12px;
+  background: #000;
+}
+
+.glasses-shape::before {
+  left: 0;
+}
+
+.glasses-shape::after {
+  right: 0;
+}
+
+.flower-shape {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #000;
+  box-shadow:
+    0 -18px 0 #000,
+    0 18px 0 #000,
+    18px 0 0 #000,
+    -18px 0 0 #000,
+    13px 13px 0 #000,
+    -13px 13px 0 #000,
+    13px -13px 0 #000,
+    -13px -13px 0 #000;
+}
+
+.flower-shape::after {
+  content: '';
+  position: absolute;
+  inset: 7px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.hat-shape {
+  width: 72px;
+  height: 38px;
+  border-radius: 34px 34px 10px 10px;
+  background: #000;
+  box-shadow: 0 28px 0 -9px #000;
+}
+
+.ribbon-shape {
+  position: relative;
+  width: 70px;
+  height: 42px;
+}
+
+.ribbon-shape::before,
+.ribbon-shape::after {
+  content: '';
+  position: absolute;
+  top: 6px;
+  width: 34px;
+  height: 30px;
+  border-radius: 50% 8px 50% 8px;
+  background: #000;
+}
+
+.ribbon-shape::before {
+  left: 2px;
+  transform: rotate(28deg);
+}
+
+.ribbon-shape::after {
+  right: 2px;
+  transform: rotate(-28deg);
+}
+
+.accessory-icon.star .accessory-star-image { width:145%; height:145%; }
+
+@media (max-width: 900px) {
+  .mascot-shop {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .accessory-grid {
+    width: min(520px, 100%);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 901px) and (max-width: 1180px) {
+  .mascot-shop {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 24px;
+  }
+
+  .mascot-area {
+    width: min(420px, 100%);
+  }
+
+  .accessory-grid {
+    width: min(760px, 100%);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .buy-button { min-height:44px; width:min(110px,100%); }
+  .preview-button { width:44px; height:44px; }
+  .shop-header {
+    display: flex;
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .point-badge {
+    align-self: start;
+  }
+
+  .shop-header .shop-title { align-self: center; }
+
+  .accessory-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .panda-stage {
+    width: min(300px, 100%);
+  }
+
+  .accessory-card {
+    min-height: 200px;
+    padding: 16px 8px 14px;
+  }
+
+  .accessory-icon {
+    width: min(108px, 100%);
+  }
+}
+
+@media (max-width: 380px) {
+  .accessory-grid {
+    grid-template-columns: 1fr;
+  }
+}

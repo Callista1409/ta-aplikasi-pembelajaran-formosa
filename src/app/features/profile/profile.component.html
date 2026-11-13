@@ -1,0 +1,47 @@
+<header class="page-header">
+  <div>
+    <h1>Profil Akun</h1>
+    <p>Informasi akun yang sedang digunakan.</p>
+  </div>
+</header>
+
+<section class="profile-panel">
+  <div class="profile-card">
+    <div class="profile-avatar" aria-hidden="true">{{ initials() }}</div>
+    <div>
+      <h2>{{ profile()?.displayName || 'Pengguna' }}</h2>
+      <p>{{ consoleLabel() }}</p>
+      <span class="badge">{{ profile()?.active ? 'Aktif' : 'Nonaktif' }}</span>
+    </div>
+  </div>
+
+  <div class="profile-grid">
+    <article>
+      <span>Nama</span>
+      <strong>{{ profile()?.displayName || '-' }}</strong>
+    </article>
+    <article>
+      <span>Username</span>
+      <strong>{{ profile()?.username || '-' }}</strong>
+    </article>
+    <article>
+      <span>Peran</span>
+      <strong>{{ roleLabel() }}</strong>
+    </article>
+    @if (profile()?.role === 'student') {
+      <article>
+        <span>Kelas</span>
+        <strong>{{ gradeLabel() }}</strong>
+      </article>
+    }
+    <article>
+      <span>Email sistem</span>
+      <strong>{{ profile()?.email || '-' }}</strong>
+    </article>
+    <article>
+      <span>Status akun</span>
+      <strong>{{ profile()?.active ? 'Aktif' : 'Nonaktif' }}</strong>
+    </article>
+  </div>
+
+</section>

@@ -1,0 +1,831 @@
+{
+  "source": "output/mandarin_vocab_kelas1-6_revisi_indonesia.xlsx",
+  "grade": 6,
+  "lessons": [
+    {
+      "lesson": 1,
+      "words": [
+        {
+          "hanzi": "恭喜",
+          "pinyin": "gōng xǐ",
+          "meaning": "Selamat"
+        },
+        {
+          "hanzi": "发财",
+          "pinyin": "fā cái",
+          "meaning": "makmur"
+        },
+        {
+          "hanzi": "余",
+          "pinyin": "yú",
+          "meaning": "kelebihan"
+        },
+        {
+          "hanzi": "平安",
+          "pinyin": "píng ān",
+          "meaning": "aman"
+        },
+        {
+          "hanzi": "年糕",
+          "pinyin": "nián gāo",
+          "meaning": "kue beras ketan"
+        },
+        {
+          "hanzi": "水饺",
+          "pinyin": "shuǐ jiǎo",
+          "meaning": "pangsit"
+        },
+        {
+          "hanzi": "红包",
+          "pinyin": "hóng bāo",
+          "meaning": "paket merah"
+        },
+        {
+          "hanzi": "新年",
+          "pinyin": "xīn nián",
+          "meaning": "Tahun Baru"
+        },
+        {
+          "hanzi": "年夜饭",
+          "pinyin": "nián yè fàn",
+          "meaning": "makan malam reuni"
+        },
+        {
+          "hanzi": "过年",
+          "pinyin": "guò nián",
+          "meaning": "merayakan Tahun Baru"
+        },
+        {
+          "hanzi": "吉利话",
+          "pinyin": "jí lì huà",
+          "meaning": "salam keberuntungan dan rejeki"
+        },
+        {
+          "hanzi": "留",
+          "pinyin": "liú",
+          "meaning": "tinggal"
+        },
+        {
+          "hanzi": "甜",
+          "pinyin": "tián",
+          "meaning": "manis"
+        },
+        {
+          "hanzi": "声音",
+          "pinyin": "shēng yīn",
+          "meaning": "suara"
+        },
+        {
+          "hanzi": "块",
+          "pinyin": "kuài",
+          "meaning": "(kata ukur yang digunakan untuk benda dalam potongan atau irisan)"
+        },
+        {
+          "hanzi": "压岁钱",
+          "pinyin": "yā suì qián",
+          "meaning": "uang yang diberikan kepada anak-anak saat Tahun Baru Imlek"
+        },
+        {
+          "hanzi": "发",
+          "pinyin": "fā",
+          "meaning": "memberi"
+        },
+        {
+          "hanzi": "大人",
+          "pinyin": "dà rén",
+          "meaning": "orang dewasa"
+        },
+        {
+          "hanzi": "压/压着",
+          "pinyin": "yā/yā zhe",
+          "meaning": "ditekan; menekan"
+        }
+      ]
+    },
+    {
+      "lesson": 2,
+      "words": [
+        {
+          "hanzi": "聪明",
+          "pinyin": "cōng míng",
+          "meaning": "cerdas"
+        },
+        {
+          "hanzi": "清楚",
+          "pinyin": "qīng chu",
+          "meaning": "jernih; jelas"
+        },
+        {
+          "hanzi": "奇怪",
+          "pinyin": "qí guài",
+          "meaning": "aneh"
+        },
+        {
+          "hanzi": "安心",
+          "pinyin": "ān xīn",
+          "meaning": "merasa nyaman"
+        },
+        {
+          "hanzi": "方块",
+          "pinyin": "fāng kuài",
+          "meaning": "memblokir; kubus"
+        },
+        {
+          "hanzi": "吵",
+          "pinyin": "chǎo",
+          "meaning": "membantah; pertengkaran"
+        },
+        {
+          "hanzi": "女人",
+          "pinyin": "nǚ rén",
+          "meaning": "wanita"
+        },
+        {
+          "hanzi": "脑",
+          "pinyin": "nǎo",
+          "meaning": "otak"
+        },
+        {
+          "hanzi": "应该",
+          "pinyin": "yīng gāi",
+          "meaning": "sebaiknya"
+        },
+        {
+          "hanzi": "站",
+          "pinyin": "zhàn",
+          "meaning": "berdiri"
+        },
+        {
+          "hanzi": "争吵",
+          "pinyin": "zhēng chǎo",
+          "meaning": "pertengkaran"
+        },
+        {
+          "hanzi": "发现",
+          "pinyin": "fā xiàn",
+          "meaning": "menemukan"
+        },
+        {
+          "hanzi": "青/青色",
+          "pinyin": "qīng/qīng sè",
+          "meaning": "hijau"
+        },
+        {
+          "hanzi": "可怜",
+          "pinyin": "kě lián",
+          "meaning": "menyedihkan"
+        }
+      ]
+    },
+    {
+      "lesson": 3,
+      "words": [
+        {
+          "hanzi": "照/照相",
+          "pinyin": "zhào/zhào xiàng",
+          "meaning": "mengambil foto"
+        },
+        {
+          "hanzi": "照片",
+          "pinyin": "zhào piàn",
+          "meaning": "foto"
+        },
+        {
+          "hanzi": "挂",
+          "pinyin": "guà",
+          "meaning": "menggantung"
+        },
+        {
+          "hanzi": "得奖",
+          "pinyin": "dé jiǎng",
+          "meaning": "memenangkan penghargaan"
+        },
+        {
+          "hanzi": "记/记录",
+          "pinyin": "jì/jì lù",
+          "meaning": "catatan; mengambil"
+        },
+        {
+          "hanzi": "郊外",
+          "pinyin": "jiāo wài",
+          "meaning": "pedesaan"
+        },
+        {
+          "hanzi": "活泼",
+          "pinyin": "huó pō",
+          "meaning": "lincah"
+        },
+        {
+          "hanzi": "文静",
+          "pinyin": "wén jìng",
+          "meaning": "lembut dan tenang"
+        },
+        {
+          "hanzi": "漂亮",
+          "pinyin": "piào liang",
+          "meaning": "cantik"
+        },
+        {
+          "hanzi": "样子",
+          "pinyin": "yàng zi",
+          "meaning": "penampilan"
+        },
+        {
+          "hanzi": "台上",
+          "pinyin": "tái shàng",
+          "meaning": "di atas panggung"
+        },
+        {
+          "hanzi": "玩具",
+          "pinyin": "wán jù",
+          "meaning": "mainan"
+        },
+        {
+          "hanzi": "奖",
+          "pinyin": "jiǎng",
+          "meaning": "hadiah"
+        },
+        {
+          "hanzi": "从小",
+          "pinyin": "cóng xiǎo",
+          "meaning": "dari muda"
+        },
+        {
+          "hanzi": "努力",
+          "pinyin": "nǔ lì",
+          "meaning": "bekerja keras"
+        },
+        {
+          "hanzi": "加上",
+          "pinyin": "jiā shàng",
+          "meaning": "menambahkan"
+        },
+        {
+          "hanzi": "后院",
+          "pinyin": "hòu yuàn",
+          "meaning": "halaman belakang"
+        },
+        {
+          "hanzi": "文字",
+          "pinyin": "wén zì",
+          "meaning": "teks; kata-kata"
+        },
+        {
+          "hanzi": "它",
+          "pinyin": "tā",
+          "meaning": "dia"
+        },
+        {
+          "hanzi": "个子",
+          "pinyin": "gè zi",
+          "meaning": "perawakan; kerangka tubuh"
+        },
+        {
+          "hanzi": "发生",
+          "pinyin": "fā shēng",
+          "meaning": "terjadi"
+        },
+        {
+          "hanzi": "事情",
+          "pinyin": "shì qing",
+          "meaning": "perselingkuhan; urusan; benda"
+        }
+      ]
+    },
+    {
+      "lesson": 4,
+      "words": [
+        {
+          "hanzi": "偶像",
+          "pinyin": "ǒu xiàng",
+          "meaning": "idola"
+        },
+        {
+          "hanzi": "名人",
+          "pinyin": "míng rén",
+          "meaning": "selebriti"
+        },
+        {
+          "hanzi": "作家",
+          "pinyin": "zuò jiā",
+          "meaning": "penulis"
+        },
+        {
+          "hanzi": "好心人",
+          "pinyin": "hǎo xīn rén",
+          "meaning": "orang yang baik hati"
+        },
+        {
+          "hanzi": "明星",
+          "pinyin": "míng xīng",
+          "meaning": "bintang"
+        },
+        {
+          "hanzi": "学习",
+          "pinyin": "xué xí",
+          "meaning": "mempelajari"
+        },
+        {
+          "hanzi": "勇敢",
+          "pinyin": "yǒng gǎn",
+          "meaning": "berani"
+        },
+        {
+          "hanzi": "关心",
+          "pinyin": "guān xīn",
+          "meaning": "khawatir"
+        },
+        {
+          "hanzi": "信心",
+          "pinyin": "xìn xīn",
+          "meaning": "kepercayaan diri"
+        },
+        {
+          "hanzi": "能干",
+          "pinyin": "néng gàn",
+          "meaning": "mampu"
+        },
+        {
+          "hanzi": "生活",
+          "pinyin": "shēng huó",
+          "meaning": "kehidupan"
+        },
+        {
+          "hanzi": "美好",
+          "pinyin": "měi hǎo",
+          "meaning": "luar biasa"
+        },
+        {
+          "hanzi": "当",
+          "pinyin": "dāng",
+          "meaning": "menjadi"
+        },
+        {
+          "hanzi": "世界",
+          "pinyin": "shì jiè",
+          "meaning": "dunia"
+        },
+        {
+          "hanzi": "轮椅",
+          "pinyin": "lún yǐ",
+          "meaning": "kursi roda"
+        },
+        {
+          "hanzi": "救火员/消防员",
+          "pinyin": "jiù huǒ yuán/xiāo fáng yuán",
+          "meaning": "petugas pemadam kebakaran"
+        },
+        {
+          "hanzi": "救",
+          "pinyin": "jiù",
+          "meaning": "menyimpan"
+        },
+        {
+          "hanzi": "穷人",
+          "pinyin": "qióng rén",
+          "meaning": "orang miskin"
+        },
+        {
+          "hanzi": "到处",
+          "pinyin": "dào chù",
+          "meaning": "di mana pun"
+        },
+        {
+          "hanzi": "苦",
+          "pinyin": "kǔ",
+          "meaning": "penderitaan"
+        },
+        {
+          "hanzi": "乐",
+          "pinyin": "lè",
+          "meaning": "kebahagiaan"
+        },
+        {
+          "hanzi": "那么",
+          "pinyin": "nà me",
+          "meaning": "Kemudian"
+        },
+        {
+          "hanzi": "不只",
+          "pinyin": "bù zhǐ",
+          "meaning": "tidak hanya"
+        }
+      ]
+    },
+    {
+      "lesson": 5,
+      "words": [
+        {
+          "hanzi": "邻居",
+          "pinyin": "lín jū",
+          "meaning": "tetangga"
+        },
+        {
+          "hanzi": "搬",
+          "pinyin": "bān",
+          "meaning": "bergerak"
+        },
+        {
+          "hanzi": "搬家",
+          "pinyin": "bān jiā",
+          "meaning": "pindah ke rumah baru"
+        },
+        {
+          "hanzi": "相处",
+          "pinyin": "xiāng chǔ",
+          "meaning": "bergaul"
+        },
+        {
+          "hanzi": "社区",
+          "pinyin": "shè qū",
+          "meaning": "lingkungan"
+        },
+        {
+          "hanzi": "路/道路",
+          "pinyin": "lù/dào lù",
+          "meaning": "jalan"
+        },
+        {
+          "hanzi": "远",
+          "pinyin": "yuǎn",
+          "meaning": "jauh"
+        },
+        {
+          "hanzi": "近",
+          "pinyin": "jìn",
+          "meaning": "di dekat"
+        },
+        {
+          "hanzi": "借",
+          "pinyin": "jiè",
+          "meaning": "meminjam; meminjamkan"
+        },
+        {
+          "hanzi": "活动中心",
+          "pinyin": "huó dòng zhōng xīn",
+          "meaning": "pusat rekreasi"
+        },
+        {
+          "hanzi": "户",
+          "pinyin": "hù",
+          "meaning": "rumah tangga"
+        },
+        {
+          "hanzi": "人家",
+          "pinyin": "rén jiā",
+          "meaning": "yang lain"
+        },
+        {
+          "hanzi": "太太",
+          "pinyin": "tài tai",
+          "meaning": "wanita yang sudah menikah"
+        },
+        {
+          "hanzi": "一定",
+          "pinyin": "yí dìng",
+          "meaning": "tentu"
+        },
+        {
+          "hanzi": "点心",
+          "pinyin": "diǎn xīn",
+          "meaning": "makanan ringan"
+        },
+        {
+          "hanzi": "不如",
+          "pinyin": "bù rú",
+          "meaning": "tidak sebaik"
+        },
+        {
+          "hanzi": "亲人",
+          "pinyin": "qīn rén",
+          "meaning": "keluarga seseorang; relatif"
+        },
+        {
+          "hanzi": "请客",
+          "pinyin": "qǐng kè",
+          "meaning": "merawat; tuan rumah"
+        }
+      ]
+    },
+    {
+      "lesson": 6,
+      "words": [
+        {
+          "hanzi": "抓住",
+          "pinyin": "zhuā zhù",
+          "meaning": "merebut"
+        },
+        {
+          "hanzi": "滑/滑倒",
+          "pinyin": "huá/huá dǎo",
+          "meaning": "terpeleset dan jatuh"
+        },
+        {
+          "hanzi": "摔/摔倒",
+          "pinyin": "shuāi/shuāi dǎo",
+          "meaning": "jatuh"
+        },
+        {
+          "hanzi": "外套",
+          "pinyin": "wài tào",
+          "meaning": "mantel"
+        },
+        {
+          "hanzi": "手套",
+          "pinyin": "shǒu tào",
+          "meaning": "sarung tangan"
+        },
+        {
+          "hanzi": "适合",
+          "pinyin": "shì hé",
+          "meaning": "sesuai"
+        },
+        {
+          "hanzi": "紧",
+          "pinyin": "jǐn",
+          "meaning": "ketat"
+        },
+        {
+          "hanzi": "流行",
+          "pinyin": "liú xíng",
+          "meaning": "modis"
+        },
+        {
+          "hanzi": "猴子",
+          "pinyin": "hóu zi",
+          "meaning": "monyet"
+        },
+        {
+          "hanzi": "马",
+          "pinyin": "mǎ",
+          "meaning": "kuda"
+        },
+        {
+          "hanzi": "根",
+          "pinyin": "gēn",
+          "meaning": "(kata ukur yang digunakan untuk jari, rambut, dll.)"
+        },
+        {
+          "hanzi": "手指",
+          "pinyin": "shǒu zhǐ",
+          "meaning": "jari"
+        },
+        {
+          "hanzi": "得意",
+          "pinyin": "dé yì",
+          "meaning": "sombong"
+        },
+        {
+          "hanzi": "树枝",
+          "pinyin": "shù zhī",
+          "meaning": "cabang"
+        },
+        {
+          "hanzi": "双手",
+          "pinyin": "shuāng shǒu",
+          "meaning": "kedua tangan"
+        }
+      ]
+    },
+    {
+      "lesson": 7,
+      "words": [
+        {
+          "hanzi": "家长",
+          "pinyin": "jiā zhǎng",
+          "meaning": "induk"
+        },
+        {
+          "hanzi": "面谈",
+          "pinyin": "miàn tán",
+          "meaning": "berbicara tatap muka"
+        },
+        {
+          "hanzi": "担心",
+          "pinyin": "dān xīn",
+          "meaning": "khawatir"
+        },
+        {
+          "hanzi": "危险",
+          "pinyin": "wēi xiǎn",
+          "meaning": "bahaya"
+        },
+        {
+          "hanzi": "过马路",
+          "pinyin": "guò mǎ lù",
+          "meaning": "menyeberang jalan"
+        },
+        {
+          "hanzi": "撞/撞倒",
+          "pinyin": "zhuàng/zhuàng dǎo",
+          "meaning": "merobohkan"
+        },
+        {
+          "hanzi": "受伤",
+          "pinyin": "shòu shāng",
+          "meaning": "terluka"
+        },
+        {
+          "hanzi": "单子",
+          "pinyin": "dān zi",
+          "meaning": "catatan tertulis"
+        },
+        {
+          "hanzi": "被",
+          "pinyin": "bèi",
+          "meaning": "oleh"
+        },
+        {
+          "hanzi": "不准",
+          "pinyin": "bù zhǔn",
+          "meaning": "melarang"
+        },
+        {
+          "hanzi": "轮子",
+          "pinyin": "lún zi",
+          "meaning": "roda"
+        },
+        {
+          "hanzi": "滑",
+          "pinyin": "huá",
+          "meaning": "meluncur"
+        },
+        {
+          "hanzi": "问路",
+          "pinyin": "wèn lù",
+          "meaning": "menanyakan arah"
+        },
+        {
+          "hanzi": "商店",
+          "pinyin": "shāng diàn",
+          "meaning": "toko"
+        },
+        {
+          "hanzi": "高中",
+          "pinyin": "gāo zhōng",
+          "meaning": "sekolah menengah atas"
+        },
+        {
+          "hanzi": "谈",
+          "pinyin": "tán",
+          "meaning": "membahas; berbicara tentang"
+        },
+        {
+          "hanzi": "最近",
+          "pinyin": "zuì jìn",
+          "meaning": "baru-baru ini"
+        },
+        {
+          "hanzi": "时间",
+          "pinyin": "shí jiān",
+          "meaning": "waktu"
+        },
+        {
+          "hanzi": "答应",
+          "pinyin": "dā ying",
+          "meaning": "setuju; janji"
+        },
+        {
+          "hanzi": "马上",
+          "pinyin": "mǎ shàng",
+          "meaning": "langsung"
+        },
+        {
+          "hanzi": "不得了",
+          "pinyin": "bù dé liǎo",
+          "meaning": "sangat; sangat"
+        }
+      ]
+    },
+    {
+      "lesson": 8,
+      "words": [
+        {
+          "hanzi": "洲",
+          "pinyin": "zhōu",
+          "meaning": "benua"
+        },
+        {
+          "hanzi": "国家",
+          "pinyin": "guó jiā",
+          "meaning": "negara"
+        },
+        {
+          "hanzi": "北美洲",
+          "pinyin": "běi měi zhōu",
+          "meaning": "Amerika Utara"
+        },
+        {
+          "hanzi": "欧洲",
+          "pinyin": "ōu zhōu",
+          "meaning": "Eropa"
+        },
+        {
+          "hanzi": "亚洲",
+          "pinyin": "yà zhōu",
+          "meaning": "Asia"
+        },
+        {
+          "hanzi": "南美洲",
+          "pinyin": "nán měi zhōu",
+          "meaning": "Amerika Selatan"
+        },
+        {
+          "hanzi": "非洲",
+          "pinyin": "fēi zhōu",
+          "meaning": "Afrika"
+        },
+        {
+          "hanzi": "大洋洲",
+          "pinyin": "dà yáng zhōu",
+          "meaning": "Oceania"
+        },
+        {
+          "hanzi": "南极洲",
+          "pinyin": "nán jí zhōu",
+          "meaning": "Antartika"
+        },
+        {
+          "hanzi": "西南边",
+          "pinyin": "xī nán biān",
+          "meaning": "di barat daya"
+        },
+        {
+          "hanzi": "指",
+          "pinyin": "zhǐ",
+          "meaning": "titik"
+        },
+        {
+          "hanzi": "地图",
+          "pinyin": "dì tú",
+          "meaning": "peta"
+        },
+        {
+          "hanzi": "出生",
+          "pinyin": "chū shēng",
+          "meaning": "dilahirkan"
+        },
+        {
+          "hanzi": "……前",
+          "pinyin": "qián",
+          "meaning": "sebelum; yang lalu"
+        },
+        {
+          "hanzi": "方言",
+          "pinyin": "fāng yán",
+          "meaning": "dialek"
+        },
+        {
+          "hanzi": "接着",
+          "pinyin": "jiē zhe",
+          "meaning": "mengikuti"
+        },
+        {
+          "hanzi": "不管",
+          "pinyin": "bù guǎn",
+          "meaning": "tanpa memedulikan"
+        },
+        {
+          "hanzi": "一整天",
+          "pinyin": "yì zhěng tiān",
+          "meaning": "sepanjang hari"
+        },
+        {
+          "hanzi": "语言",
+          "pinyin": "yǔ yán",
+          "meaning": "bahasa"
+        },
+        {
+          "hanzi": "西班牙文",
+          "pinyin": "xī bān yá wén",
+          "meaning": "Spanyol (bahasa)"
+        },
+        {
+          "hanzi": "全(世界)",
+          "pinyin": "quán",
+          "meaning": "keseluruhan (dunia)"
+        },
+        {
+          "hanzi": "地方",
+          "pinyin": "dì fang",
+          "meaning": "tempat"
+        },
+        {
+          "hanzi": "可能",
+          "pinyin": "kě néng",
+          "meaning": "mungkin"
+        },
+        {
+          "hanzi": "出国",
+          "pinyin": "chū guó",
+          "meaning": "pergi ke luar negeri"
+        },
+        {
+          "hanzi": "机会",
+          "pinyin": "jī huì",
+          "meaning": "peluang"
+        }
+      ]
+    }
+  ]
+}

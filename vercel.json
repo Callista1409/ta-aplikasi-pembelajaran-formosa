@@ -1,0 +1,46 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "frontend-angular": {
+      "root": ".",
+      "framework": "angular",
+      "installCommand": "npm ci",
+      "buildCommand": "npm run build",
+      "devCommand": "node server/dev.mjs",
+      "outputDirectory": "dist/frontend-angular/browser",
+      "routes": [
+        {
+          "handle": "filesystem"
+        },
+        {
+          "src": "/api/.*",
+          "status": 404
+        },
+        {
+          "src": "/.*",
+          "dest": "/index.html"
+        }
+      ]
+    },
+    "admin-backend": {
+      "root": "admin-backend",
+      "runtime": "node",
+      "entrypoint": "server.mjs",
+      "devCommand": "node server.mjs"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": {
+        "service": "admin-backend"
+      }
+    },
+    {
+      "source": "/(.*)",
+      "destination": {
+        "service": "frontend-angular"
+      }
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+@if (dataWarning()) { <p class="warning" role="alert">{{ dataWarning() }}</p> }
+<header class="page-heading">
+  <p>Dashboard Admin</p>
+  <h1>Dashboard Pembelajaran Mandarin</h1>
+</header>
+
+<p class="period-caption" aria-live="polite">
+  Ringkasan saat terakhir dimuat.
+  @if (reportUpdated()) { Terakhir dimuat: {{ reportUpdated() }}. }
+  <button type="button" (click)="refreshReports()" [disabled]="reportLoading() || authRosterLoading()">{{ reportLoading() ? 'Memuat…' : 'Perbarui laporan' }}</button>
+</p>
+
+<section class="stats" aria-label="Ringkasan dashboard admin">
+  @for (stat of stats(); track stat.label) {
+    <article>
+      <span>{{ stat.label }}</span>
+      <strong>{{ stat.value }}</strong>
+    </article>
+  }
+</section>
+
+<section class="dashboard-grid" aria-label="Grafik dashboard admin">
+  <article class="panel student-panel" aria-label="Aktivitas murid">
+    <div class="panel-heading split">
+      <div>
+        <h2>Aktivitas Murid</h2>
+      </div>
+      <strong>{{ periodStudentTotal() }} poin pada rentang ini</strong>
+      <div class="period-filters">
+        <label>
+          <span>Tanggal mulai</span>
+          <input type="date" aria-label="Tanggal mulai aktivitas murid" [value]="studentStartDateId()" (change)="changeStudentStartDate($any($event.target).value)" />
+        </label>
+        <label>
+          <span>Tanggal akhir</span>
+          <input type="date" aria-label="Tanggal akhir aktivitas murid" [min]="studentStartDateId()" [value]="studentEndDateId()" (change)="changeStudentEndDate($any($event.target).value)" />
+        </label>
+      </div>
+    </div>
+
+    <p class="period-caption">Rentang tanggal: {{ studentDateRange() }}</p>
+    <div class="weekly-chart student-chart" role="group" aria-label="Grafik poin per murid pada rentang tanggal terpilih">
+      @for (student of studentPointBars(); track student.id) {
+        <button type="button" class="activity-column student-column" [attr.aria-label]="'Lihat rincian poin murid ' + student.name + ', ' + student.points + ' poin'" (click)="openStudentPoints(student.id)">
+          <i aria-hidden="true" [style.--height]="student.height + '%'">
+            <em>{{ student.points }}</em>
+          </i>
+          <span>{{ student.name }} [SD {{ student.grade || '-' }}]</span>
+        </button>
+      } @empty {
+        <p class="activity-empty">Belum ada data murid.</p>
+      }
+    </div>
+  </article>
+
+  <article class="panel production-panel" aria-label="Aktivitas konten guru">
+    <div class="panel-heading split">
+      <div>
+        <h2>Aktivitas Konten Guru</h2>
+      </div>
+      <strong>{{ teacherProductionTotal() }} item pada rentang ini</strong>
+      <div class="period-filters">
+        <label>
+          <span>Tanggal mulai</span>
+          <input type="date" aria-label="Tanggal mulai aktivitas guru" [value]="contentStartDateId()" (change)="changeContentStartDate($any($event.target).value)" />
+        </label>
+        <label>
+          <span>Tanggal akhir</span>
+          <input type="date" aria-label="Tanggal akhir aktivitas guru" [min]="contentStartDateId()" [value]="contentEndDateId()" (change)="changeContentEndDate($any($event.target).value)" />
+        </label>
+      </div>
+    </div>
+
+    <p class="period-caption">Rentang tanggal: {{ contentDateRange() }}</p>
+    <div class="production-split">
+      <section aria-label="Flashcard yang dikelola guru">
+        <h3>Flashcard</h3>
+        <div class="weekly-chart compact-chart" role="group" aria-label="Grafik flashcard per guru">
+          @for (teacher of teacherFlashcardBars(); track teacher.id) {
+              <div class="activity-column teacher-column" role="img" [attr.aria-label]="teacher.label + ': ' + teacher.flashcards + ' flashcard pada rentang tanggal terpilih.'">
+              <i aria-hidden="true" [style.--height]="teacher.flashcardHeight + '%'">
+                <em>{{ teacher.flashcards }}</em>
+              </i>
+              <span>{{ teacher.label }}</span>
+            </div>
+          } @empty {
+            <p class="activity-empty">Belum ada data guru.</p>
+          }
+        </div>
+      </section>
+      <section aria-label="Soal yang dikelola guru">
+        <h3>Soal</h3>
+        <div class="weekly-chart compact-chart" role="group" aria-label="Grafik soal per guru">
+          @for (teacher of teacherQuestionBars(); track teacher.id) {
+              <div class="activity-column teacher-column" role="img" [attr.aria-label]="teacher.label + ': ' + teacher.questions + ' soal pada rentang tanggal terpilih.'">
+              <i aria-hidden="true" [style.--height]="teacher.questionHeight + '%'">
+                <em>{{ teacher.questions }}</em>
+              </i>
+              <span>{{ teacher.label }}</span>
+            </div>
+          } @empty {
+            <p class="activity-empty">Belum ada data guru.</p>
+          }
+        </div>
+      </section>
+    </div>
+  </article>
+</section>

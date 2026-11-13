@@ -1,0 +1,81 @@
+<header class="shop-header">
+  <a class="student-back-button" routerLink="../dashboard" title="Kembali ke dashboard" aria-label="Kembali ke dashboard">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6-6-6 6 6 6" /></svg>
+  </a>
+  <div class="shop-title">
+    <h1>Aksesoris maskot</h1>
+  </div>
+
+  <div class="point-badge" aria-label="Saldo star untuk belanja" title="Saldo star untuk belanja">
+    <img class="star-icon" src="assets/Star%20Icon.png" alt="">
+    <strong>{{ learning.starBalance() }}</strong>
+  </div>
+</header>
+
+@if (learning.starError()) { <p role="alert">{{ learning.starError() }}</p> }
+@if (learning.starSaving()) { <p role="status">Menyimpan perubahan...</p> }
+
+<ng-template #accessoryCard let-item>
+  <article
+    class="accessory-card"
+    [class.is-equipped]="item.equipped"
+    [class.is-purchased]="item.owned && !item.equipped"
+    [class.is-unowned]="!item.owned"
+    [class.is-previewing]="learning.previewAccessoryId() === item.id"
+  >
+    <div
+      [class]="'accessory-icon accessory-' + item.id + ' ' + accessoryKind(item)"
+      [class.preview-asset]="isLocalPreviewAsset(item)"
+      aria-hidden="true"
+    >
+      @if (accessoryAsset(item); as asset) {
+        <img [src]="asset" [alt]="item.name">
+      } @else {
+        @if (accessoryKind(item) === 'star') { <img class="star-icon accessory-star-image" src="assets/Star%20Icon.png" alt=""> }
+        @if (accessoryKind(item) === 'ribbon') { <span class="ribbon-shape"></span> }
+        @if (accessoryKind(item) === 'hat') { <span class="hat-shape"></span> }
+        @if (accessoryKind(item) === 'glasses') { <span class="glasses-shape"></span> }
+        @if (accessoryKind(item) === 'flower') { <span class="flower-shape"></span> }
+      }
+    </div>
+    <strong class="accessory-name">{{ item.name }}</strong>
+    <button
+      type="button"
+      class="preview-button"
+      [class.previewing]="learning.previewAccessoryId() === item.id"
+      [attr.aria-label]="learning.previewAccessoryId() === item.id ? 'Tutup preview ' + item.name : 'Pratinjau ' + item.name"
+      [attr.title]="learning.previewAccessoryId() === item.id ? 'Tutup preview' : 'Pratinjau'"
+      (click)="learning.previewAccessory(item.id)"
+    >
+      <span aria-hidden="true">&#128065;</span>
+    </button>
+    <div class="price">
+      <img class="star-icon" src="assets/Star%20Icon.png" alt="">
+      <strong>{{ item.price }}</strong>
+    </div>
+    <button
+      type="button"
+      class="buy-button"
+      [class.installed]="item.equipped"
+      [disabled]="learning.starSaving() || !learning.pointsLoaded() || (!item.owned && learning.starBalance() < item.price)"
+      (click)="learning.buyOrEquip(item.id)"
+    >
+      {{ item.equipped ? 'Terpasang' : item.owned ? 'Pasang' : 'Beli' }}
+    </button>
+  </article>
+</ng-template>
+
+<section class="mascot-shop wardrobe" aria-label="Kelola aksesoris maskot">
+  <div class="mascot-area">
+    <div class="panda-stage">
+      <app-mascot-display />
+    </div>
+    <div class="wardrobe-caption"><strong>Wardrobe Maskot</strong><span>Pilih aksesoris untuk mencoba atau memasangnya.</span></div>
+  </div>
+
+  <div class="accessory-grid">
+    @for (item of accessories(); track item.id) {
+      <ng-container [ngTemplateOutlet]="accessoryCard" [ngTemplateOutletContext]="{ $implicit: item }" />
+    }
+  </div>
+</section>

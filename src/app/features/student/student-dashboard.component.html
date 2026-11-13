@@ -1,0 +1,90 @@
+<header class="student-hero">
+  <div class="student-hero-content">
+  <div class="hero-copy">
+    <h1>Hello, {{ studentName() }}</h1>
+    <strong>{{ gradeLabel() }}</strong>
+  </div>
+  <a
+    class="mascot mascot-link"
+    routerLink="../shop"
+    aria-label="Buka halaman Kelola Maskot"
+    title="Kelola Maskot"
+  >
+    <app-mascot-display variant="default" />
+    <span class="mascot-tool-badge" aria-hidden="true">
+      <svg viewBox="0 0 24 24" focusable="false">
+        <path d="M12 7V5a2 2 0 1 0-2-2" />
+        <path d="m2.5 15.5 8.67-7.17a1.25 1.25 0 0 1 1.66 0l8.67 7.17a1 1 0 0 1-.64 1.77H3.14a1 1 0 0 1-.64-1.77Z" />
+      </svg>
+    </span>
+  </a>
+  <div class="reward-stack">
+    <div class="point-counter" title="Saldo star untuk membeli aksesori" aria-label="Saldo star untuk membeli aksesori"><img class="star-icon" src="assets/Star%20Icon.png" alt=""><strong>{{ learning.starBalance() }}</strong></div>
+  </div>
+  </div>
+</header>
+
+@if (learning.starError()) { <p role="alert">{{ learning.starError() }}</p> }
+
+<div class="student-progress-grid">
+<section class="weekly">
+  <div class="section-heading">
+    <div>
+      <h2>Aktivitas Mingguan</h2>
+      <p>Wow, kamu sudah mendapatkan {{ weeklyTotal() }} poin pada minggu pilihan ini!</p>
+    </div>
+    <div class="tracking-filters">
+      <label>
+        <span>Tahun</span>
+        <app-ui-select ariaLabel="Pilih tahun" [options]="yearOptions()" [value]="selectedYearId()" (valueChange)="changeYear($event)" />
+      </label>
+      <label>
+        <span>Bulan</span>
+        <app-ui-select ariaLabel="Pilih bulan" [options]="monthOptions()" [value]="selectedMonthId()" (valueChange)="changeMonth($event)" />
+      </label>
+      <label>
+        <span>Minggu</span>
+        <app-ui-select ariaLabel="Pilih minggu" [options]="weekOptions()" [value]="selectedWeekId()" (valueChange)="changeWeek($event)" />
+      </label>
+    </div>
+  </div>
+  <div class="bars">
+    @for (day of weeklyTrack(); track day.label) {
+      <div [style.--height]="day.height + '%'">
+        <i><em>{{ day.points }}</em></i>
+        <span>{{ day.label }}</span>
+        <small>{{ day.dateLabel }}</small>
+      </div>
+    }
+  </div>
+</section>
+
+<section class="teacher-notes" aria-label="Catatan Guru">
+  <div class="section-heading">
+    <div>
+      <h2>Catatan Guru</h2>
+      <p>Komentar dan arahan dari guru untuk membantu proses belajarmu.</p>
+    </div>
+    @if (unreadComments().length) { <span class="note-badge">{{ unreadComments().length }} belum dibaca</span> }
+  </div>
+  <div class="teacher-notes-list">
+    @for (comment of comments.comments(); track comment.id) {
+      <button class="teacher-note" type="button" [class.unread]="!comment.readAt" (click)="openComment()">
+        <span><strong>{{ comment.teacherName }}</strong><small>{{ comment.commentDate }}</small></span>
+        <p>{{ comment.comment }}</p>
+        @if (!comment.readAt) { <b>Baru</b> }
+      </button>
+    } @empty {
+      <p class="empty">Belum ada catatan dari guru.</p>
+    }
+  </div>
+</section>
+</div>
+
+<section class="actions">
+  <a class="start" routerLink="../lesson"><span><strong>Mulai Pelajaran</strong><small>Pilih unit, pelajari flashcard, lalu uji kemampuanmu.</small></span><span class="start-mascot" aria-hidden="true"><app-mascot-display variant="study" /></span></a>
+  <a class="report-link" routerLink="../report">
+    <span>Lihat rapor</span>
+    <span class="report-mascot" aria-hidden="true"><app-mascot-display variant="rapor" /></span>
+  </a>
+</section>

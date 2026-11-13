@@ -1,0 +1,71 @@
+{
+  "name": "frontend-angular",
+  "version": "0.0.0",
+  "packageManager": "npm@11.17.0",
+  "scripts": {
+    "prebuild": "node scripts/build-student-curriculum.mjs",
+    "test:student-security": "node --test admin-backend/student-learning.test.mjs",
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "seed:firebase": "node scripts/seed-firebase.mjs",
+    "seed:students": "node scripts/seed-extra-students.mjs",
+    "sync:login-usernames": "node scripts/sync-login-usernames.mjs",
+    "migrate:username-login": "node scripts/migrate-username-login.mjs",
+    "admin:api": "node admin-backend/server.mjs",
+    "deploy:rules": "node scripts/deploy-firestore-rules.mjs",
+    "import:vocab": "node scripts/import-vocabulary-csv.mjs",
+    "translate:vocab": "node scripts/translate-vocabulary-indonesian.mjs",
+    "archive:names": "node scripts/archive-vocabulary-entries.mjs",
+    "import:sd6-correction": "node scripts/import-sd6-correction.mjs",
+    "test:rules:emulator": "firebase emulators:exec --only firestore --project demo-formosa-stage2 \"node scripts/firestore-rules-stage2.test.mjs\"",
+    "test:stars": "node --test scripts/student-stars.test.mjs",
+    "test": "ng test",
+    "test:unit": "node scripts/run-unit-tests.mjs"
+  },
+  "prettier": {
+    "printWidth": 100,
+    "singleQuote": true,
+    "overrides": [
+      {
+        "files": "*.html",
+        "options": {
+          "parser": "angular"
+        }
+      }
+    ]
+  },
+  "private": true,
+  "dependencies": {
+    "@angular/common": "^20.3.0",
+    "@angular/compiler": "^20.3.0",
+    "@angular/core": "^20.3.0",
+    "@angular/forms": "^20.3.0",
+    "@angular/platform-browser": "^20.3.0",
+    "@angular/router": "^20.3.0",
+    "firebase": "^12.15.0",
+    "firebase-admin": "^14.0.0",
+    "hanzi-writer": "^3.0.0",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0",
+    "zone.js": "~0.15.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^20.3.28",
+    "@angular/cli": "^20.3.28",
+    "@angular/compiler-cli": "^20.3.0",
+    "@firebase/rules-unit-testing": "^5.0.0",
+    "@types/jasmine": "~5.1.0",
+    "jasmine-core": "~5.9.0",
+    "karma": "~6.4.0",
+    "karma-chrome-launcher": "~3.2.0",
+    "karma-coverage": "~2.2.0",
+    "karma-jasmine": "~5.1.0",
+    "karma-jasmine-html-reporter": "~2.1.0",
+    "typescript": "~5.9.2"
+  },
+  "engines": {
+    "node": "^22.12.0 || ^24.0.0"
+  }
+}

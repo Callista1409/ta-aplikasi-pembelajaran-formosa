@@ -1,0 +1,62 @@
+.count-badge { border-radius: 999px; padding: 9px 13px; color: var(--brand-dark); background: var(--brand-soft); font-size: 13px; font-weight: 800; white-space: nowrap; }
+.registration-layout { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(280px, .8fr); gap: 18px; height: clamp(320px, calc(100vh - 220px), 760px); height: clamp(320px, calc(100dvh - 220px), 760px); }
+.registration-list, .registration-detail { min-width: 0; min-height: 0; }
+.registration-list { display: flex; flex-direction: column; }
+.registration-scroll { container-type: inline-size; flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; scrollbar-gutter: stable; padding: 2px 4px 4px 2px; }
+.registration-scroll:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; border-radius: 6px; }
+.list-heading { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 12px; flex-shrink: 0; color: var(--muted); }
+.list-heading strong { color: var(--ink); font-size: 18px; }
+.registration-row { display: grid; grid-template-columns: minmax(160px, 1.4fr) minmax(100px, max-content) minmax(110px, 1fr) minmax(130px, 1fr); align-items: center; gap: 12px 28px; border: 1px solid var(--line); border-radius: 8px; padding: 12px; cursor: pointer; }
+.registration-row + .registration-row { margin-top: 8px; }
+.registration-row:hover, .registration-row.selected { border-color: var(--brand); background: var(--brand-soft); }
+.registration-row strong, .registration-row span { display: block; }
+.registration-row > div span { margin-top: 3px; color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
+.registration-row > span { color: var(--ink); font-size: 12px; font-weight: 700; }
+.status { color: var(--brand) !important; }
+.status.verified { color: var(--success) !important; }
+.status-state.approved { color: var(--success) !important; }
+.status-state.rejected { color: var(--brand) !important; }
+.registration-detail { overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; border: 1px solid var(--line); border-radius: 8px; padding: 24px; background: #fffaf9; }
+.registration-detail > .eyebrow { margin-bottom: 12px; }
+.registration-detail h2 { margin-bottom: 24px; }
+.registration-detail dl { display: grid; gap: 18px; margin: 0; }
+.registration-detail dl div { border-bottom: 1px solid var(--line); padding-bottom: 16px; }
+.registration-detail dt { color: var(--muted); font-size: 12px; font-weight: 800; }
+.registration-detail dd { margin: 8px 0 0; line-height: 1.5; overflow-wrap: anywhere; }
+.form-error { margin: 16px 0 0; border-left: 3px solid var(--brand); border-radius: 5px; padding: 10px 12px; color: var(--brand-dark); background: var(--brand-soft); font-size: 13px; }
+.username-field { display: grid; gap: 10px; margin-top: 26px; color: var(--ink); font-size: 13px; font-weight: 800; }
+.username-field input { min-height: 46px; }
+.username-field + .button { width: 100%; min-height: 46px; margin-top: 18px; }
+.username-summary { display: grid; gap: 3px; margin: 18px 0 10px; border-radius: 7px; padding: 10px 12px; background: var(--brand-soft); }
+.username-summary span, .mail-note { color: var(--muted); font-size: 12px; }
+.username-summary strong { color: var(--brand-dark); }
+.mail-note { margin: 8px 0 0; line-height: 1.4; }
+.detail-actions { display: flex; gap: 12px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); }
+.detail-actions .button { flex: 1; min-height: 44px; }
+.empty-state, .empty-detail { color: var(--muted); }
+.empty-state { padding: 28px 14px; text-align: center; }
+.empty-state strong, .empty-detail strong { display: block; margin-bottom: 5px; color: var(--ink); }
+.empty-state p, .empty-detail p { margin: 0; font-size: 13px; }
+@media (max-width: 1100px) {
+  .registration-layout { grid-template-columns: 1fr; height: auto; }
+  .registration-list { height: clamp(260px, 55vh, 480px); height: clamp(260px, 55dvh, 480px); }
+  .registration-detail { max-height: 65vh; max-height: 65dvh; }
+}
+@media (max-width: 650px) {
+  .registration-list { min-height: 340px; max-height: 58vh; padding: 14px; }
+  .registration-filters { gap: 5px; }
+  .registration-filters button { padding-inline: 8px; font-size: 11px; }
+  .registration-row { grid-template-columns: 1fr 1fr; }
+  .registration-row > div { grid-column: 1 / -1; }
+  .count-badge { white-space: normal; }
+}
+
+.registration-row .account-role { justify-self: start; white-space: nowrap; line-height: 1.4; }
+@container (max-width: 720px) {
+  .registration-row { grid-template-columns: minmax(100px, max-content) minmax(0, 1fr); column-gap: 28px; }
+  .registration-row > div { grid-column: 1 / -1; }
+  .registration-row .status-state { grid-column: 1 / -1; }
+}
+.status-filter { display: grid; gap: 7px; flex-shrink: 0; align-self: flex-end; width: min(280px, 100%); margin-bottom: 16px; color: var(--muted); font-size: 12px; font-weight: 800; }
+.status-filter select { min-height: 42px; font-size: 14px; font-weight: 500; }
+@media (max-width: 650px) { .status-filter select { min-height: 44px; font-size: 16px; } }

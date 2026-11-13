@@ -1,0 +1,34 @@
+<header class="page-heading">
+  <p>{{ eyebrow() }}</p>
+  <h1>{{ title() }}</h1>
+  <span>{{ description() }}</span>
+</header>
+
+<section class="stats" aria-label="Ringkasan dashboard">
+  @for (stat of stats(); track stat.label) {
+    <article>
+      <span>{{ stat.label }}</span>
+      <strong>{{ stat.value }}</strong>
+      <small>{{ stat.description }}</small>
+    </article>
+  }
+</section>
+
+<section class="panel">
+  <div class="panel-heading">
+    <div>
+      <h2>Tracking Pembelajaran</h2>
+      <p>Data contoh untuk fondasi komponen Angular.</p>
+    </div>
+    <select aria-label="Pilih periode">
+      <option>Bulan ini</option>
+      <option>Bulan lalu</option>
+    </select>
+  </div>
+
+  <div class="chart" aria-label="Grafik poin siswa">
+    @for (height of [52, 76, 40, 64, 88, 58, 70]; track $index) {
+      <div [style.--height]="height + '%'"><i></i><span>{{ ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'][$index] }}</span></div>
+    }
+  </div>
+</section>

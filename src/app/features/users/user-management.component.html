@@ -1,0 +1,155 @@
+<header class="page-header">
+  <div>
+    <p class="eyebrow">{{ eyebrow }}</p>
+    <h1>{{ title }}</h1>
+    <p>{{ editable ? 'Kelola akun, status, dan data awal pengguna.' : 'Guru hanya dapat melihat data siswa.' }}</p>
+  </div>
+</header>
+
+@if (deleteSuccess()) { <p class="form-note" role="status">{{ deleteSuccess() }}</p> }
+
+<section class="panel">
+  <div class="toolbar">
+    <label class="field">Cari
+      <input type="search" placeholder="Nama atau username" [ngModel]="search()" (ngModelChange)="search.set($event)" />
+    </label>
+    @if (role === 'student') {
+      <label class="field">Kelas
+        <select [ngModel]="grade()" (ngModelChange)="grade.set($event)">
+          <option value="all">Semua kelas</option>
+          @for (level of [1, 2, 3, 4, 5, 6]; track level) { <option [value]="level">SD {{ level }}</option> }
+        </select>
+      </label>
+    }
+    <label class="field">Status
+      <select [ngModel]="status()" (ngModelChange)="status.set($event)">
+        <option value="all">Semua status</option>
+        <option value="true">Aktif</option>
+        <option value="false">Nonaktif</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="data-list">
+    <div class="data-row header">
+      <span>Nama</span><span>{{ role === 'student' ? 'Kelas' : 'Role' }}</span><span>Username</span><span>Status</span><span>Aksi</span>
+    </div>
+    @for (user of filteredUsers(); track user.id) {
+      <div class="data-row readable-row" role="button" tabindex="0" (click)="openRead(user)" (keydown.enter)="openRead(user)">
+        <strong>{{ user.displayName }}</strong>
+        <span>{{ role === 'student' ? 'SD ' + user.grade : 'Guru' }}</span>
+        <span>{{ user.username }}</span>
+        <span class="badge" [class.warning]="!user.active">{{ user.deletionStatus === 'deleting' ? 'Penghapusan diproses' : user.deletionStatus === 'failed' ? 'Penghapusan belum selesai' : user.active ? 'Aktif' : 'Nonaktif' }}</span>
+        <div class="actions">
+          @if (editable) {
+            <button class="icon-button edit" type="button" aria-label="Edit" [disabled]="!!user.deletionStatus || deletingPermanently()" (click)="$event.stopPropagation(); openEdit(user)"></button>
+            <button class="icon-button deactivate" type="button" aria-label="Nonaktifkan" [disabled]="!!user.deletionStatus || deletingPermanently()" (click)="$event.stopPropagation(); pendingDelete.set(user)"></button>
+            <button class="icon-button delete" type="button" [attr.aria-label]="(user.deletionStatus ? 'Lanjutkan penghapusan ' : 'Hapus permanen ') + user.displayName" [title]="user.deletionStatus ? 'Lanjutkan penghapusan' : 'Hapus permanen'" [disabled]="deletingPermanently()" (click)="$event.stopPropagation(); openPermanentDelete(user)"></button>
+          } @else { <span class="muted">Lihat saja</span> }
+        </div>
+      </div>
+    } @empty {
+      <p class="muted">Tidak ada data yang sesuai filter.</p>
+    }
+  </div>
+</section>
+
+@if (formOpen()) {
+  <div class="modal-backdrop">
+    <section class="modal-card">
+      <h2>Edit Akun {{ role === 'teacher' ? 'Guru' : 'Siswa' }}</h2>
+      <div class="form-grid">
+        <label class="field">Nama lengkap<input [(ngModel)]="form.displayName" [disabled]="saving()" /></label>
+        <label class="field">Username<input [(ngModel)]="form.username" [disabled]="saving()" /></label>
+        @if (role === 'student') {
+          <label class="field">Kelas
+            <select [(ngModel)]="form.grade" [disabled]="saving()">@for (level of [1,2,3,4,5,6]; track level) { <option [ngValue]="level">SD {{ level }}</option> }</select>
+          </label>
+        }
+        <label class="field">Status
+          <select [(ngModel)]="form.active" [disabled]="saving()"><option [ngValue]="true">Aktif</option><option [ngValue]="false">Nonaktif</option></select>
+        </label>
+      </div>
+      @if (formInfo()) {
+        <p class="form-note">{{ formInfo() }}</p>
+      }
+      @if (formError()) {
+        <p class="warning">{{ formError() }}</p>
+      }
+      <div class="actions">
+        <button class="button secondary" type="button" [disabled]="saving()" (click)="formOpen.set(false)">Batal</button>
+        <button class="button" type="button" [disabled]="saving()" (click)="save()">{{ saving() ? 'Menyimpan...' : 'Simpan Akun' }}</button>
+      </div>
+    </section>
+  </div>
+}
+
+@if (readerOpen(); as user) {
+  <div class="modal-backdrop">
+    <section class="modal-card reader">
+      <div class="reader-header">
+        <div>
+          <h2>Detail Akun</h2>
+          <p>{{ user.displayName }}</p>
+        </div>
+        <span class="badge" [class.warning]="!user.active">{{ user.active ? 'Aktif' : 'Nonaktif' }}</span>
+      </div>
+      <div class="read-grid">
+        <article><span>Nama lengkap</span><p>{{ user.displayName }}</p></article>
+        <article><span>Username</span><p>{{ user.username }}</p></article>
+        <article><span>Role</span><p>{{ user.role === 'student' ? 'Murid' : user.role === 'teacher' ? 'Guru' : 'Admin' }}</p></article>
+        @if (user.role === 'student') {
+          <article><span>Kelas</span><p>SD {{ user.grade }}</p></article>
+        }
+        <article><span>Status</span><p>{{ user.active ? 'Aktif' : 'Nonaktif' }}</p></article>
+        @if (user.email) {
+          <article><span>Email internal</span><p>{{ user.email }}</p></article>
+        }
+      </div>
+      <div class="actions">
+        <button class="button secondary" type="button" (click)="readerOpen.set(null)">Tutup</button>
+        @if (editable) {
+          <button class="button" type="button" [disabled]="!!user.deletionStatus" (click)="openEdit(user)">Edit Akun</button>
+        }
+      </div>
+    </section>
+  </div>
+}
+
+@if (pendingDelete(); as user) {
+  <div class="modal-backdrop">
+    <section class="modal-card">
+      <h2>Nonaktifkan akun?</h2>
+      <p>Akun <strong>{{ user.displayName }}</strong> tidak dapat login, tetapi data dan riwayat belajarnya tetap tersimpan.</p>
+      <div class="actions"><button class="button secondary" (click)="pendingDelete.set(null)">Batal</button><button class="button danger" (click)="confirmDelete()">Nonaktifkan</button></div>
+    </section>
+  </div>
+}
+
+@if (pendingPermanentDelete(); as user) {
+  <div class="modal-backdrop">
+    <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="delete-account-title" [attr.aria-busy]="deletingPermanently()">
+      <h2 id="delete-account-title">{{ user.deletionStatus ? 'Lanjutkan penghapusan akun?' : 'Hapus permanen akun?' }}</h2>
+      <p>Akun <strong>{{ user.displayName }}</strong> akan dihapus dari login dan daftar pengguna.</p>
+      <p>Username: <strong>{{ user.username }}</strong> · {{ user.role === 'student' ? 'Siswa' : 'Guru' }}</p>
+      @if (user.role === 'student') {
+        <p>Poin, progres kartu dan soal, aktivitas, aksesoris, komentar, serta sesi dan jawaban latihan dan posttest siswa ini akan dihapus.</p>
+      } @else {
+        <p>Unit, flashcard, soal, dan komentar yang dibuat guru tetap tersimpan agar materi belajar siswa tidak hilang.</p>
+      }
+      <p>Penghapusan bersifat permanen dan tidak dapat dibatalkan. Jika proses terhenti, coba lagi untuk melanjutkan.</p>
+      <label class="field delete-confirm-field">Ketik HAPUS untuk konfirmasi
+        <input [ngModel]="deleteConfirmText()" (ngModelChange)="deleteConfirmText.set($event)" [disabled]="deletingPermanently()" />
+      </label>
+      @if (deleteError()) {
+        <p class="warning" role="alert">{{ deleteError() }}</p>
+      }
+      <div class="actions">
+        <button class="button secondary" type="button" [disabled]="deletingPermanently()" (click)="closePermanentDelete()">Batal</button>
+        <button class="button danger" type="button" [disabled]="deletingPermanently() || !canDeletePermanently()" (click)="confirmPermanentDelete()">
+          {{ deletingPermanently() ? 'Menghapus...' : 'Hapus Permanen' }}
+        </button>
+      </div>
+    </section>
+  </div>
+}

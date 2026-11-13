@@ -1,0 +1,50 @@
+.grade-summary { grid-template-columns: repeat(6, minmax(120px, 1fr)); margin-bottom: 16px; }
+.panel > .toolbar { position: sticky; top: 0; z-index: 4; margin-top: 0; padding-block: 10px; background: var(--paper); }
+.grade-summary button { color: var(--ink); text-align: left; }
+.grade-summary button.active { border-color: var(--brand); background: var(--brand-soft); }
+.question-tree, .card-groups, .question-items { display: grid; gap: 10px; }
+.question-tree { height: clamp(280px, 68vh, 720px); align-content: start; grid-auto-rows: max-content; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; border: 1px solid var(--line); border-radius: 8px; padding: 12px; background: #fffafa; }
+.unit-group { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.unit-toggle { display: flex; justify-content: space-between; width: 100%; padding: 13px 15px; color: var(--ink); background: #fffafa; text-align: left; }
+.unit-toggle b, .unit-toggle small { display: block; }.unit-toggle small { margin-top: 4px; color: var(--muted); }
+.card-groups { padding: 12px; }.question-card { display: grid; grid-template-columns: 190px 1fr; gap: 14px; border-left: 4px solid var(--brand); padding: 12px; background: #fff; }
+.vocab b, .vocab span { display: block; }.vocab b { font-size: 28px; }.vocab span { color: var(--muted); }
+.question-item { display: grid; grid-template-columns: 90px minmax(180px, 1fr) 140px 90px; align-items: center; gap: 10px; border: 1px solid var(--line); border-radius: 7px; padding: 9px; background:#fff; cursor:pointer; }
+.question-item:hover, .question-item:focus-visible { border-color: var(--brand); background: #fffafa; outline: none; }
+.question-item small { color: var(--muted); }
+.add-inline { justify-self: start; color: var(--brand); background: transparent; font-weight: 800; }
+.builder { width: min(880px, 100%); }
+.flashcard-search { display:grid; gap:6px; margin-bottom:16px; }
+.flashcard-search-row { display:flex; gap:8px; }
+.flashcard-search-row input { flex:1; min-width:0; }
+.flashcard-search-row .button { flex-shrink:0; }
+.flashcard-search-results { margin-bottom:16px; }
+.flashcard-result-list { display:grid; gap:6px; max-height:190px; overflow-y:auto; }
+.flashcard-result { border:1px solid var(--line); border-radius:7px; padding:10px 12px; background:#fff; color:var(--ink); text-align:left; }
+.flashcard-result:hover, .flashcard-result.selected { border-color:var(--brand); background:var(--brand-soft); }
+.flashcard-result:focus-visible { outline:2px solid var(--brand); outline-offset:2px; }
+.full { grid-column: 1 / -1; }
+.readonly-value { display:grid; gap:3px; min-height:41px; border:1px solid var(--line); border-radius:7px; padding:9px 12px; color:var(--ink); background:#fffafa; }
+.readonly-value small { color:var(--muted); font-weight:700; }
+.field small { color:var(--muted); font-weight:700; }
+.reader { width:min(760px, 100%); }
+.reader-header { display:flex; justify-content:space-between; gap:16px; align-items:start; margin-bottom:16px; }
+.reader-header h2 { margin-bottom:4px; }
+.reader-header p { margin:0; color:var(--muted); }
+.read-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.read-grid article { border:1px solid var(--line); border-radius:7px; padding:12px; background:#fffafa; }
+.read-grid article.wide { grid-column:1/-1; }
+.read-grid span { display:block; margin-bottom:7px; color:var(--muted); font-size:12px; font-weight:900; }
+.read-grid p { margin:0; }
+.option-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+.option-list p { border:1px solid var(--line); border-radius:7px; padding:9px 10px; background:#fff; }
+@media (max-width: 900px) { .grade-summary { grid-template-columns: repeat(3, 1fr); }.question-card, .question-item { grid-template-columns: 1fr; } }
+@media (max-width: 760px) { .read-grid, .option-list { grid-template-columns:1fr; } }
+
+@media (max-width: 520px) {
+  .grade-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .unit-toggle { align-items:start; gap:10px; }
+  .card-groups { padding:10px; }
+  .question-card { padding:10px; }
+  .question-item { gap:8px; }
+}

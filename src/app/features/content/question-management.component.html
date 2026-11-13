@@ -1,0 +1,145 @@
+<header class="page-header">
+  <div>
+    <p class="eyebrow">{{ adminMode ? 'Dashboard Admin' : 'Dashboard Guru' }}</p>
+    <h1>Manajemen Soal</h1>
+    <p>Soal disusun berdasarkan level, unit, lalu flashcard.</p>
+  </div>
+  <button class="button" type="button" (click)="openCreate()">Tambah Soal</button>
+</header>
+
+<section class="summary-grid grade-summary">
+  @for (level of levels; track level) {
+    <button class="summary-card" [class.active]="grade() === level.toString()" (click)="changeGrade(level.toString())">
+      <b>SD {{ level }}</b>
+      <strong>{{ gradeCount(level) }} soal</strong>
+      <span>W {{ categoryCount(level, 'writing') }} | L {{ categoryCount(level, 'listening') }} | S {{ categoryCount(level, 'speaking') }} | R {{ categoryCount(level, 'reading') }}</span>
+    </button>
+  }
+</section>
+
+<section class="panel">
+  <div class="toolbar">
+    <label class="field">Cari kosakata<input [ngModel]="search()" (ngModelChange)="search.set($event)" placeholder="Karakter, pinyin, arti" /></label>
+    <label class="field">Level<app-ui-select ariaLabel="Pilih level soal" [options]="gradeOptions" [value]="grade()" (valueChange)="changeGrade($event)" /></label>
+    <label class="field">Unit<app-ui-select ariaLabel="Pilih unit soal" [options]="unitOptions()" [value]="unitId()" (valueChange)="changeUnit($event)" /></label>
+    <label class="field">User<app-ui-select ariaLabel="Pilih pembuat soal" [options]="ownerOptions()" [value]="ownerId()" (valueChange)="changeOwner($event)" /></label>
+    <label class="field">Kategori<app-ui-select ariaLabel="Pilih kategori soal" [options]="categoryOptions" [value]="category()" (valueChange)="changeCategoryFilter($event)" /></label>
+  </div>
+  <p class="muted">{{ totalFiltered() }} soal sesuai filter</p>
+
+  <div class="question-tree">
+    @for (unit of visibleUnits(); track unit.id) {
+      <article class="unit-group">
+        <button class="unit-toggle" type="button" (click)="toggleUnit(unit.id)">
+          <span><b>SD {{ unit.grade }} - {{ unit.name }}</b><small>{{ cardsInUnit(unit.id).length }} flashcard</small></span>
+          <span>{{ isUnitOpen(unit.id) ? '^' : 'v' }}</span>
+        </button>
+        @if (isUnitOpen(unit.id)) {
+          <div class="card-groups">
+            @for (card of cardsInUnit(unit.id); track card.id) {
+              <section class="question-card">
+                <div class="vocab"><b lang="zh-Hans">{{ card.hanzi }}</b><span>{{ card.pinyin }} - {{ card.meaning }}</span></div>
+                <div class="question-items">
+                  @for (question of questionsForCard(card.id); track question.id) {
+                    <div class="question-item" role="button" tabindex="0" (click)="openRead(question)" (keydown.enter)="openRead(question)">
+                      <span class="badge">{{ categoryLabel(question.category) }}</span>
+                      <span>{{ question.prompt }}</span>
+                      <small>{{ data.userName(question.createdBy) }}</small>
+                      <div class="actions">
+                        @if (canEdit(question)) {
+                          <button class="icon-button edit" type="button" aria-label="Edit soal" (click)="$event.stopPropagation(); openEdit(question)"></button>
+                          <button class="icon-button delete" type="button" aria-label="Hapus soal" (click)="$event.stopPropagation(); pendingDelete.set(question)"></button>
+                        } @else {
+                          <span class="muted">Lihat saja</span>
+                        }
+                      </div>
+                    </div>
+                  } @empty { <span class="muted">Belum ada soal.</span> }
+                  <button class="add-inline" type="button" (click)="openCreateForCard(card.id)">+ Tambah soal untuk flashcard ini</button>
+                </div>
+              </section>
+            }
+          </div>
+        }
+      </article>
+    } @empty { <p class="muted">Tidak ada kosakata yang sesuai dengan pencarian dan filter.</p> }
+  </div>
+</section>
+
+@if (builderOpen()) {
+  <div class="modal-backdrop"><section class="modal-card builder">
+    <h2>{{ editingId ? 'Edit Soal' : 'Tambah Soal Baru' }}</h2>
+    <form class="flashcard-search" (ngSubmit)="searchFlashcards()">
+      <label class="field" for="builder-vocabulary-search">Cari kosakata</label>
+      <div class="flashcard-search-row">
+        <input id="builder-vocabulary-search" name="vocabularySearch" type="search" placeholder="Ketik karakter, pinyin, atau arti" [ngModel]="flashcardSearchInput()" (ngModelChange)="flashcardSearchInput.set($event)" />
+        <button class="button" type="submit">Cari</button>
+      </div>
+    </form>
+    @if (flashcardSearch()) {
+      <div class="flashcard-search-results" aria-live="polite">
+        <p class="muted">{{ flashcardOptions().length }} kosakata ditemukan. Pilih kosakata untuk soal.</p>
+        <div class="flashcard-result-list">
+          @for (option of flashcardOptions(); track option.value) {
+            <button type="button" class="flashcard-result" [class.selected]="form.flashcardId === option.value" [attr.aria-pressed]="form.flashcardId === option.value" (click)="changeFlashcard(option.value)">{{ option.label }}</button>
+          } @empty { <p class="muted">Kosakata tidak ditemukan. Coba kata lain atau kosongkan pencarian lalu tekan Cari.</p> }
+        </div>
+      </div>
+    }
+    <div class="form-grid">
+      @if (flashcardSearch()) {
+        <div class="field"><span>Flashcard terpilih</span><div class="readonly-value">{{ selectedFlashcardLabel(form) }}</div></div>
+      } @else {
+        <label class="field">Flashcard<app-ui-select ariaLabel="Pilih flashcard" [options]="flashcardOptions()" [value]="form.flashcardId" (valueChange)="changeFlashcard($event)" /></label>
+      }
+      <label class="field">Kategori<app-ui-select ariaLabel="Pilih kategori soal" [options]="categoryOptions.slice(1)" [value]="form.category" (valueChange)="changeCategory($event)" /></label>
+      @if (form.category === 'listening') {
+        <label class="field full">Teks audio Mandarin bebas<textarea [(ngModel)]="form.audioText" placeholder="Contoh: 你好，我叫 Emily。你叫什么名字？"></textarea><small>Ketik sendiri kalimat/cerita Mandarin yang akan dibacakan sebagai audio, tidak harus sama dengan kosakata flashcard.</small></label>
+      }
+      @if (form.category === 'reading') {
+        <label class="field full">Teks bacaan<textarea [(ngModel)]="form.passage" placeholder="Masukkan teks atau cerita pendek Mandarin."></textarea></label>
+      }
+      <label class="field full">Pertanyaan<textarea [(ngModel)]="form.prompt" placeholder="Tulis pertanyaan yang akan dijawab murid."></textarea></label>
+      @if (form.category === 'listening' || form.category === 'reading') {
+        <label class="field">Pilihan A<input [(ngModel)]="optionA" /></label>
+        <label class="field">Pilihan B<input [(ngModel)]="optionB" /></label>
+        <label class="field">Pilihan C<input [(ngModel)]="optionC" /></label>
+        <label class="field">Pilihan D<input [(ngModel)]="optionD" /></label>
+        <label class="field">Jawaban benar
+          <app-ui-select ariaLabel="Pilih jawaban benar" [options]="answerOptionOptions()" [value]="correctOption" (valueChange)="changeCorrectOption($event)" />
+        </label>
+      } @else {
+        <label class="field">Jawaban sistem<input [value]="form.correctAnswer || 'Mengikuti karakter flashcard'" readonly /></label>
+      }
+      <div class="field"><span>Poin maksimum</span><div class="readonly-value"><b>{{ systemPoint(form.category) }} poin</b><small>Dari aturan sistem</small></div></div>
+    </div>
+    <div class="actions"><button class="button secondary" type="button" (click)="builderOpen.set(false)">Batal</button><button class="button" type="button" (click)="save()">Simpan Soal</button></div>
+  </section></div>
+}
+
+@if (readerOpen(); as question) {
+  <div class="modal-backdrop"><section class="modal-card reader">
+    <div class="reader-header"><div><h2>Detail Soal</h2><p>{{ selectedFlashcardLabel(question) }}</p></div><span class="badge">{{ categoryLabel(question.category) }}</span></div>
+    <div class="read-grid">
+      <article class="wide"><span>Pertanyaan</span><p>{{ question.prompt }}</p></article>
+      @if (question.category === 'listening') {
+        <article class="wide"><span>Teks audio Mandarin</span><p lang="zh-Hans">{{ audioTextLabel(question) }}</p></article>
+      }
+      @if (question.category === 'reading' && question.passage) {
+        <article class="wide"><span>Teks bacaan</span><p lang="zh-Hans">{{ question.passage }}</p></article>
+      }
+      @if (usesMultipleChoice(question.category)) {
+        <article class="wide"><span>Pilihan jawaban</span><div class="option-list">@for (item of optionRows(question); track item.letter) { <p><b>{{ item.letter }}.</b> {{ item.value }}</p> }</div></article>
+      }
+      <article><span>Jawaban benar</span><p>{{ correctAnswerLabel(question) }}</p></article>
+      <article><span>Poin maksimum</span><p>{{ systemPoint(question.category) }} poin</p></article>
+      <article><span>Dibuat oleh</span><p>{{ data.userName(question.createdBy) }}</p></article>
+    </div>
+    <div class="actions">
+      <button class="button secondary" type="button" (click)="readerOpen.set(null)">Tutup</button>
+      @if (canEdit(question)) { <button class="button" type="button" (click)="openEdit(question)">Edit Soal</button> }
+    </div>
+  </section></div>
+}
+
+@if (pendingDelete(); as question) { <div class="modal-backdrop"><section class="modal-card"><h2>Hapus soal?</h2><p>{{ question.prompt }}</p><div class="actions"><button class="button secondary" type="button" (click)="pendingDelete.set(null)">Batal</button><button class="button danger" type="button" (click)="confirmDelete()">Hapus</button></div></section></div> }

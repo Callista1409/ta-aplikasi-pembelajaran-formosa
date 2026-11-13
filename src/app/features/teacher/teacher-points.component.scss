@@ -1,0 +1,43 @@
+.tracking-grid > .panel {
+  height: clamp(420px, calc(100dvh - 280px), 720px);
+  min-width: 0;
+  min-height: 0;
+}
+
+.student-list {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.student-list > .panel-heading {
+  flex-shrink: 0;
+}
+
+.student-table {
+  flex: 1;
+  min-height: 0;
+  align-content: start;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.table-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--paper);
+}
+
+.detail-panel {
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+@media (max-width: 680px) {
+  .tracking-grid > .panel {
+    height: max(360px, 65dvh);
+  }
+}

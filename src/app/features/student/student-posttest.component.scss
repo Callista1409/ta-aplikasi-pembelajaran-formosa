@@ -1,0 +1,50 @@
+.posttest-mark-all { display:flex; align-items:flex-start; gap:10px; margin:14px 0; font-weight:700; line-height:1.45; }
+.posttest-mark-all input { width:20px; height:20px; flex:0 0 20px; margin-top:2px; accent-color:var(--brand); }
+.posttest-mark-all:has(input:disabled) { cursor:default; }
+
+.posttest-preparation { width:min(1100px,100%); margin:auto; }
+.posttest-eyebrow { display:block; margin-bottom:8px; color:#6b4f97; font-size:13px; font-weight:800; }
+.posttest-entry { position:relative; z-index:1; display:grid; gap:16px; width:min(800px,100%); margin:24px 0 36px; padding:20px; border:1px solid #d8c8ee; border-radius:16px; background:#f8f4ff; }
+.posttest-entry h2 { margin:4px 0 8px; font-size:22px; }
+.posttest-entry p { margin:4px 0; line-height:1.4; }
+.posttest-entry .posttest-eyebrow { margin-bottom:4px; font-size:12px; }
+.posttest-entry-note { color:var(--muted); font-size:13px; }
+.posttest-entry-actions { display:flex; flex-wrap:wrap; gap:10px; }
+.posttest-overview { display:grid; grid-template-columns:1.6fr 1fr; gap:20px; margin:28px 0; }
+.posttest-intro-card,.posttest-progress-card { border:1px solid var(--line); border-radius:16px; padding:24px; background:#fff; }
+.posttest-intro-card p,.posttest-progress-card p { line-height:1.65; color:var(--muted); }
+.posttest-categories { display:flex; flex-wrap:wrap; gap:8px; margin:18px 0; }
+.posttest-categories span { border-radius:20px; padding:8px 12px; color:#60437e; background:#f1eafa; font-weight:700; font-size:13px; }
+.posttest-progress-card { display:grid; justify-items:center; align-content:center; text-align:center; gap:12px; background:#fbf8ff; }
+.posttest-progress-card progress { width:100%; height:12px; accent-color:#8d63b6; }
+.posttest-card-position { grid-column:1; margin:0; color:var(--muted); text-align:center; }
+.posttest-missing { text-align:left; line-height:1.7; }
+.posttest-ready { color:#27764a!important; font-weight:700; }
+.posttest-confirmation { display:flex; align-items:flex-start; gap:10px; margin:18px 0; line-height:1.5; cursor:pointer; }
+.posttest-confirmation input { width:20px; height:20px; margin:2px 0 0; accent-color:#735198; flex:0 0 auto; }
+.test-workspace.posttest-workspace { grid-template-columns:minmax(0,1fr); width:min(900px,100%); margin:0 auto; }
+.posttest-passage { padding:22px; border-radius:12px; background:#f6f2fc; font-size:26px; line-height:1.9; text-align:left; }
+.choice-grid button.posttest-selected { border-color:#8d63b6; background:#eee4fa; color:#4c3267; opacity:1; }
+.posttest-skip { margin-top:20px; }
+.posttest-results { display:grid; justify-items:center; gap:24px; width:min(850px,100%); margin:40px auto; padding:32px 24px; border:1px solid var(--line); border-radius:20px; background:#fff; text-align:center; }
+.posttest-results h1 { margin:0; }
+.posttest-result-score { display:grid; gap:12px; }
+.posttest-result-score > strong { color:#735198; font-size:72px; line-height:1.1; }
+.posttest-result-score small { font-size:28px; }
+.posttest-category-results { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); width:100%; gap:12px; }
+.posttest-category-results article { display:grid; gap:10px; padding:18px 12px; border-radius:12px; background:#f7f3fc; }
+.posttest-category-results strong { font-size:25px; }
+.posttest-answer-review { width:100%; text-align:left; }
+.posttest-answer-review summary { padding:14px; border-radius:8px; background:#f7f3fc; cursor:pointer; font-weight:700; }
+.posttest-answer-review ol { padding-left:30px; }
+.posttest-answer-review li { padding:14px 4px; border-bottom:1px solid var(--line); overflow-wrap:anywhere; }
+.posttest-answer-review li > span { display:block; margin-top:8px; }
+@media(max-width:760px) {
+  .posttest-overview { grid-template-columns:1fr; }
+  .posttest-entry { padding:18px; }
+  .posttest-entry-actions > * { flex:1 1 160px; text-align:center; }
+  .posttest-entry-actions { width:100%; }
+  .posttest-category-results { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .posttest-intro-card,.posttest-progress-card { padding:18px; }
+  .posttest-passage { font-size:22px; padding:16px; }
+}

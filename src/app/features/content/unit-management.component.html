@@ -1,0 +1,58 @@
+<header class="page-header">
+  <div><p class="eyebrow">Dashboard Admin</p><h1>Manajemen Level dan Unit</h1><p>Admin mengatur struktur unit SD 1 sampai SD 6.</p></div>
+  <button class="button" type="button" (click)="openCreate()">Tambah Unit</button>
+</header>
+
+<section class="panel">
+  <div class="level-grid">
+    @for (level of levels; track level) {
+      <article class="level-card">
+        <h2>SD {{ level }}</h2>
+        @for (unit of unitsAtGrade(level); track unit.id) {
+          <div class="unit-row" role="button" tabindex="0" [class.selected]="selectedUnitId() === unit.id" (click)="selectedUnitId.set(unit.id)" (keydown.enter)="selectedUnitId.set(unit.id)">
+            <span><strong>{{ unit.name }}</strong><small>{{ countFlashcards(unit.id) }} flashcard, {{ countQuestions(unit.id) }} soal</small></span>
+            <span class="unit-actions">
+              <button class="icon-button edit" type="button" aria-label="Edit unit" (click)="openEdit(unit, $event)"></button>
+              <button class="icon-button delete" type="button" aria-label="Hapus unit" (click)="$event.stopPropagation(); pendingDelete.set(unit)"></button>
+            </span>
+          </div>
+        } @empty { <p class="muted">Belum ada unit.</p> }
+      </article>
+    }
+  </div>
+</section>
+
+@if (selectedUnit(); as unit) {
+  <section class="panel">
+    <div class="unit-detail-header">
+      <div><h2>{{ unit.name }}</h2><p>SD {{ unit.grade }} · {{ unit.description || 'Belum ada catatan unit.' }}</p></div>
+      <span class="badge">{{ countFlashcards(unit.id) }} flashcard, {{ countQuestions(unit.id) }} soal</span>
+    </div>
+    <h3>Flashcard di Unit</h3>
+    <div class="unit-flashcards">
+      @for (card of selectedFlashcards(); track card.id) {
+        <div><b lang="zh-Hans">{{ card.hanzi }}</b><span>{{ card.pinyin }}</span><small>{{ card.meaning }}</small></div>
+      } @empty { <p class="muted">Belum ada flashcard di unit ini.</p> }
+    </div>
+  </section>
+}
+
+@if (formOpen()) {
+  <div class="modal-backdrop"><section class="modal-card">
+    <h2>{{ editingId ? 'Edit Unit' : 'Tambah Unit Baru' }}</h2>
+    @if (saveError()) { <p class="form-error" role="alert">{{ saveError() }}</p> }
+    <div class="form-grid">
+      <label class="field">Level<select [(ngModel)]="form.grade">@for (level of levels; track level) { <option [ngValue]="level">SD {{ level }}</option> }</select></label>
+      <label class="field">Nama unit<input [(ngModel)]="form.name" placeholder="Contoh: Unit Salam" /></label>
+      <label class="field">Catatan<textarea [(ngModel)]="form.description"></textarea></label>
+    </div>
+    <div class="actions"><button class="button secondary" type="button" (click)="formOpen.set(false)">Batal</button><button class="button" type="button" [disabled]="saving()" (click)="save()">{{ saving() ? 'Menyimpan...' : 'Simpan Unit' }}</button></div>
+  </section></div>
+}
+
+@if (pendingDelete(); as unit) {
+  <div class="modal-backdrop"><section class="modal-card">
+    <h2>Hapus {{ unit.name }}?</h2><p>Flashcard dan soal di dalam unit ini juga akan dihapus.</p>
+    <div class="actions"><button class="button secondary" (click)="pendingDelete.set(null)">Batal</button><button class="button danger" (click)="confirmDelete()">Hapus Unit</button></div>
+  </section></div>
+}

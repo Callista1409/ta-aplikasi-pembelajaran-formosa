@@ -1,0 +1,36 @@
+<header class="archive-heading">
+  <a class="student-back-button" routerLink="../dashboard" aria-label="Kembali">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6-6-6 6 6 6" /></svg>
+  </a>
+  <div><span class="archive-eyebrow">Penilaian khusus</span><h1>Arsip Posttest</h1><p>Hasil posttest yang sudah selesai. Nilai ini tidak menambah poin latihan, saldo hadiah, atau peringkat.</p></div>
+</header>
+  <label class="archive-filter">Murid<select [ngModel]="selectedStudent()" (ngModelChange)="selectedStudent.set($event)">
+    <option value="">Semua murid</option>
+    @for (student of students(); track student.id) { <option [value]="student.id">{{ student.displayName }} · SD {{ student.grade }}</option> }
+  </select></label>
+@if (archive.error()) { <p class="panel" role="alert">{{ archive.error() }}</p> }
+@else if (!archive.loaded()) { <p class="panel" role="status">Memuat arsip posttest...</p> }
+@else if (!entries().length) { <section class="panel archive-empty"><h2>Belum ada hasil posttest</h2><p>Hasil akan otomatis tampil di sini setelah seluruh 60 soal selesai dan jawaban tersimpan.</p></section> }
+@else {
+  <div class="archive-list">
+    @for (entry of entries(); track entry.id) {
+      <article class="panel archive-card">
+        <header><div><span class="archive-eyebrow">Selesai · SD {{ entry.grade }} · Versi {{ entry.version }}</span><h2>{{ studentName(entry.studentId) }}</h2><p>{{ entry.completedAt ? (entry.completedAt | date:'dd MMM yyyy, HH:mm') : 'Tanggal selesai tidak tersedia' }}</p></div>
+          <div class="archive-score"><strong>{{ entry.summary.percentage }}<small>/100</small></strong><span>{{ entry.summary.score }}/60 poin penilaian</span></div>
+        </header>
+        <div class="archive-categories">
+          @for (category of entry.summary.categories; track category.category) { <div><span>{{ category.category }}</span><strong>{{ category.score }}/15</strong></div> }
+        </div>
+        <details><summary>Rincian jawaban</summary><ol>
+          @for (answer of entry.answers; track answer.questionId; let index = $index) {
+            <li><strong>{{ index + 1 }}. {{ answer.category }} · {{ answer.skipped ? 'Dilewati' : answer.correct ? 'Benar' : posttestAnswerScore(answer) > 0 ? 'Sebagian benar' : 'Belum tepat' }}</strong>
+              <p>Nilai: {{ posttestAnswerScore(answer) }}/1</p>
+              @if (answer.category === 'writing') { <p>{{ answer.writingMistakes }} kesalahan goresan@if (answer.writingStrokes !== undefined) { dari {{ answer.writingStrokes }} goresan }</p> }
+              <p>{{ entry.plan[index].question.prompt }}</p><p>Jawaban: {{ answer.response || 'Tidak diisi' }}</p><p>Kunci: {{ entry.plan[index].question.correctAnswer }}</p>
+            </li>
+          }
+        </ol></details>
+      </article>
+    }
+  </div>
+}

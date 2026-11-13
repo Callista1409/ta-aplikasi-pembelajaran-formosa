@@ -1,0 +1,62 @@
+<header class="page-heading">
+  <p>Dashboard Guru</p>
+  <h1>Dashboard Pembelajaran Mandarin</h1>
+</header>
+
+<p class="period-caption" aria-live="polite">
+  Ringkasan saat terakhir dimuat.
+  @if (reportUpdated()) { Terakhir dimuat: {{ reportUpdated() }}. }
+  <button type="button" (click)="refreshReports()" [disabled]="reportLoading()">{{ reportLoading() ? 'Memuat…' : 'Perbarui laporan' }}</button>
+</p>
+
+<section class="stats" aria-label="Ringkasan dashboard guru">
+  @for (stat of stats(); track stat.label) {
+    <article>
+      <span>{{ stat.label }}</span>
+      <strong>{{ stat.value }}</strong>
+    </article>
+  }
+</section>
+
+@if (dataWarning()) {
+  <p class="warning">{{ dataWarning() }}</p>
+}
+
+<section class="chart-grid" aria-label="Grafik dashboard guru">
+  <article class="panel chart-panel" aria-label="Grafik poin murid">
+    <div class="panel-heading with-filters">
+      <div>
+        <h2>Aktivitas Murid</h2>
+      </div>
+      <strong>{{ periodStudentTotal() }} poin pada rentang ini</strong>
+      <div class="period-filters">
+        <label>
+          <span>Tanggal mulai</span>
+          <input type="date" aria-label="Tanggal mulai aktivitas murid" [value]="startDateId()" (change)="changeStartDate($any($event.target).value)" />
+        </label>
+        <label>
+          <span>Tanggal akhir</span>
+          <input type="date" aria-label="Tanggal akhir aktivitas murid" [min]="startDateId()" [value]="endDateId()" (change)="changeEndDate($any($event.target).value)" />
+        </label>
+      </div>
+    </div>
+
+    <p class="period-caption">Rentang tanggal: {{ dateRangeLabel() }}</p>
+    <div class="bar-chart student-progress-chart" role="group" aria-label="Grafik poin per murid pada rentang tanggal terpilih">
+      @for (student of studentProgressBars(); track student.id) {
+        <button
+          type="button"
+          [class.active]="student.id === selectedStudent().id"
+          [style.--height]="student.height + '%'"
+          [attr.aria-label]="student.label + ', ' + student.gradeLabel + ', ' + student.points + ' poin'"
+          (click)="selectStudent(student.id)"
+        >
+          <i aria-hidden="true"><em>{{ student.points }}</em></i>
+          <span>{{ student.label }} [{{ student.gradeLabel }}]</span>
+        </button>
+      } @empty {
+        <p class="empty">Belum ada data murid untuk ditampilkan.</p>
+      }
+    </div>
+  </article>
+</section>

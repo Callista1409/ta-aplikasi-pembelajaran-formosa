@@ -1,0 +1,107 @@
+<header class="page-header">
+  <div><p class="eyebrow">{{ adminMode ? 'Dashboard Admin' : 'Dashboard Guru' }}</p><h1>Manajemen Flashcard</h1><p>Cari, lihat, tambah, edit, dan hapus flashcard sesuai hak akses.</p></div>
+  <button class="button" type="button" (click)="openCreate()">Tambah Flashcard</button>
+</header>
+
+<section class="summary-grid grade-summary">
+  @for (level of levels; track level) {
+    <button class="summary-card" [class.active]="grade() === level.toString()" (click)="changeGrade(level.toString())">
+      <b>SD {{ level }}</b>
+      <strong>{{ gradeCount(level) }} flashcard</strong>
+    </button>
+  }
+</section>
+
+<section class="panel">
+  <div class="toolbar">
+    <label class="field">Cari kosakata<input type="search" placeholder="Karakter, pinyin, arti" [ngModel]="search()" (ngModelChange)="search.set($event)" /></label>
+    <label class="field">Level<app-ui-select ariaLabel="Pilih level flashcard" [options]="gradeOptions" [value]="grade()" (valueChange)="changeGrade($event)" /></label>
+    <label class="field">Unit<app-ui-select ariaLabel="Pilih unit flashcard" [options]="unitOptions()" [value]="unitId()" (valueChange)="changeUnit($event)" /></label>
+    <label class="field">User<app-ui-select ariaLabel="Pilih pembuat flashcard" [options]="ownerOptions()" [value]="ownerId()" (valueChange)="changeOwner($event)" /></label>
+  </div>
+
+  <p class="muted">{{ totalFiltered() }} flashcard sesuai filter</p>
+
+  <div class="flashcard-tree">
+    @for (unit of visibleUnits(); track unit.id) {
+      <article class="unit-group">
+        <button class="unit-toggle" type="button" (click)="toggleUnit(unit.id)">
+          <span><b>SD {{ unit.grade }} - {{ unit.name }}</b><small>{{ cardsInUnit(unit.id).length }} flashcard</small></span>
+          <span>{{ isUnitOpen(unit.id) ? '^' : 'v' }}</span>
+        </button>
+        @if (isUnitOpen(unit.id)) {
+          <div class="flashcard-list">
+            @for (card of cardsInUnit(unit.id); track card.id) {
+              <article class="readable-row" role="button" tabindex="0" (click)="openRead(card)" (keydown.enter)="openRead(card)">
+                <div class="character" lang="zh-Hans">{{ card.hanzi }}</div>
+                <div><strong>{{ card.pinyin }}</strong><span>{{ card.meaning }}</span><small>SD {{ unitGrade(card.unitId) }} - {{ unitName(card.unitId) }}</small></div>
+                <div class="card-meta"><span class="badge">{{ questionCount(card.id) }} soal tersedia</span><small>Dibuat oleh {{ data.userName(card.createdBy) }}</small></div>
+                <div class="actions">
+                  @if (canEdit(card)) { <button class="icon-button edit" type="button" aria-label="Edit" (click)="$event.stopPropagation(); openEdit(card)"></button><button class="icon-button delete" type="button" aria-label="Hapus" (click)="$event.stopPropagation(); pendingDelete.set(card)"></button> }
+                  @else { <span class="muted">Lihat saja</span> }
+                </div>
+              </article>
+            } @empty { <p class="muted">Tidak ada flashcard yang sesuai.</p> }
+          </div>
+        }
+      </article>
+    } @empty { <p class="muted">Tidak ada kosakata yang sesuai dengan pencarian dan filter.</p> }
+  </div>
+</section>
+
+@if (formOpen()) {
+  <div class="modal-backdrop"><section class="modal-card">
+    <h2>{{ editingId ? 'Edit Flashcard' : 'Tambah Flashcard' }}</h2>
+    <div class="form-grid">
+      <label class="field">Kelas<app-ui-select ariaLabel="Pilih kelas flashcard" [options]="formGradeOptions" [value]="formGrade()" (valueChange)="changeFormGrade($event)" /></label>
+      <label class="field">Bab<app-ui-select ariaLabel="Pilih bab flashcard" [options]="formUnitOptions()" [value]="form.unitId" (valueChange)="changeFormUnit($event)" />
+        @if (!formUnitOptions().length) { <small>Belum ada bab untuk kelas ini.</small> }
+      </label>
+      <label class="field">Karakter Mandarin<input [(ngModel)]="form.hanzi" /></label>
+      <label class="field">Pinyin bernada<input [(ngModel)]="form.pinyin" placeholder="Contoh: nǐ hǎo" /></label>
+      <label class="field">Arti<input [(ngModel)]="form.meaning" /></label>
+      <label class="field media-field">Gambar flashcard
+        <input type="file" accept="image/jpeg,image/png,image/webp" (change)="selectImage($event)" />
+        <small>{{ imageName() }}</small>
+      </label>
+      <div class="field tts-field"><span>Audio Mandarin</span>
+        <div><strong>TTS otomatis</strong><small>{{ form.hanzi ? 'Dibuat dari: ' + form.hanzi : 'Isi karakter Mandarin terlebih dahulu' }}</small></div>
+      </div>
+    </div>
+    <div class="preview-card">
+      @if (imagePreview()) { <img [src]="imagePreview()" alt="Preview gambar flashcard" /> }
+      <b lang="zh-Hans">{{ form.hanzi || '字' }}</b><span>{{ form.pinyin || 'pinyin' }}</span><small>{{ form.meaning || 'arti' }}</small>
+    </div>
+    @if (mediaError()) { <p class="media-error" role="alert">{{ mediaError() }}</p> }
+    <div class="actions"><button class="button secondary" [disabled]="saving()" (click)="closeForm()">Batal</button><button class="button" [disabled]="saving()" (click)="save()">{{ saving() ? 'Menyimpan...' : 'Simpan Flashcard' }}</button></div>
+  </section></div>
+}
+
+@if (readerOpen(); as card) {
+  <div class="modal-backdrop"><section class="modal-card reader">
+    <div class="reader-header">
+      <div><h2>Detail Flashcard</h2><p>SD {{ unitGrade(card.unitId) }} - {{ unitName(card.unitId) }}</p></div>
+      <span class="badge">{{ questionCount(card.id) }} soal</span>
+    </div>
+    <div class="flashcard-detail-hero">
+      @if (card.imageUrl) { <img [src]="card.imageUrl" alt="Gambar flashcard" /> }
+      <div><b lang="zh-Hans">{{ card.hanzi }}</b><strong>{{ card.pinyin }}</strong><span>{{ card.meaning }}</span></div>
+    </div>
+    <div class="read-grid">
+      <article><span>Karakter Mandarin</span><p lang="zh-Hans">{{ card.hanzi }}</p></article>
+      <article><span>Pinyin</span><p>{{ card.pinyin }}</p></article>
+      <article><span>Arti</span><p>{{ card.meaning }}</p></article>
+      <article><span>Kategori bab</span><p>SD {{ unitGrade(card.unitId) }} - {{ unitName(card.unitId) }}</p></article>
+      <article><span>Audio</span><p>{{ card.audioMode === 'tts' ? 'TTS otomatis' : card.audioUrl ? 'Audio upload' : 'Belum ada audio' }}</p></article>
+      <article><span>Dibuat oleh</span><p>{{ data.userName(card.createdBy) }}</p></article>
+    </div>
+    <div class="actions">
+      <button class="button secondary" type="button" (click)="readerOpen.set(null)">Tutup</button>
+      @if (canEdit(card)) { <button class="button" type="button" (click)="openEdit(card)">Edit Flashcard</button> }
+    </div>
+  </section></div>
+}
+
+@if (pendingDelete(); as card) {
+  <div class="modal-backdrop"><section class="modal-card"><h2>Hapus {{ card.hanzi }}?</h2><p>Soal yang menggunakan flashcard ini juga akan dihapus.</p><div class="actions"><button class="button secondary" (click)="pendingDelete.set(null)">Batal</button><button class="button danger" (click)="confirmDelete()">Hapus</button></div></section></div>
+}

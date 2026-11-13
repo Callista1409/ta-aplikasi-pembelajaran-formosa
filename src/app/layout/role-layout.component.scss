@@ -1,0 +1,260 @@
+.app-shell {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.menu-toggle { display: none; }
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  min-height: 100vh;
+  padding: 24px 18px;
+  color: #fff;
+  background: var(--brand-dark);
+  overflow: hidden;
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+  border-radius: 8px;
+  padding: 6px;
+  color: #fff;
+  text-decoration: none;
+  transition:
+    background 140ms ease,
+    transform 140ms ease;
+
+  strong,
+  small {
+    display: block;
+  }
+
+  small {
+    margin-top: 3px;
+    opacity: 0.72;
+  }
+
+  &:hover,
+  &.identity-active {
+    background: rgb(255 255 255 / 10%);
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+}
+
+.avatar {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  color: var(--brand-dark);
+  background: #fff7f5;
+  font-weight: 900;
+}
+
+nav {
+  display: grid;
+  gap: 8px;
+  overflow-y: auto;
+  padding-bottom: 18px;
+
+  a {
+    border-radius: 7px;
+    padding: 12px 14px;
+    color: #fff;
+    text-decoration: none;
+  }
+
+  a:hover,
+  a.active {
+    color: var(--brand-dark);
+    background: #fff7f5;
+  }
+}
+
+.logout {
+  margin-top: auto;
+  border-radius: 7px;
+  padding: 11px;
+  color: #fff;
+  background: rgb(0 0 0 / 24%);
+}
+
+.content {
+  position: relative;
+  min-width: 0;
+  padding: 32px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+.student-shell {
+  position: relative;
+  background: #fffdf8;
+
+  .sidebar {
+    background: #8e2631;
+  }
+
+  .sidebar nav a:hover,
+  .sidebar nav a.active {
+    color: #7f2630;
+    background: #ffe2dc;
+  }
+
+  .content {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background: #fffdf8;
+  }
+
+  .content > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .content::before {
+    display: none;
+  }
+
+  .student-hero,
+  .student-progress-grid,
+  .actions {
+    position: relative;
+    z-index: 2;
+  }
+}
+
+@media (max-width: 760px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: sticky;
+    top: 0;
+    z-index: 15;
+    height: auto;
+    min-height: auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0 12px;
+    padding: max(8px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) 8px max(14px, env(safe-area-inset-left));
+    overflow: visible;
+  }
+
+  .identity {
+    min-width: 0;
+    margin-bottom: 0;
+    div { min-width: 0; }
+    strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  }
+
+  .menu-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    align-self: center;
+    min-height: 44px;
+    border: 1px solid rgb(255 255 255 / 35%);
+    border-radius: 8px;
+    padding: 8px 12px;
+    color: #fff;
+    background: rgb(0 0 0 / 15%);
+    span { font-size: 22px; line-height: 1; }
+  }
+
+  .avatar {
+    width: 38px;
+    height: 38px;
+  }
+
+  nav {
+    display: none;
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    max-height: 50dvh;
+    padding: 12px 0 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+
+    a {
+      display: flex;
+      align-items: center;
+      min-height: 44px;
+      padding: 10px 12px;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  .logout {
+    display: none;
+    grid-column: 1 / -1;
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .menu-open nav { display: grid; }
+  .menu-open .logout { display: block; min-height: 44px; }
+
+  .content {
+    padding: 24px max(22px, env(safe-area-inset-right)) max(32px, env(safe-area-inset-bottom)) max(22px, env(safe-area-inset-left));
+  }
+}
+
+.student-shell .content:has(.stroke-backdrop) {
+  z-index: 16;
+}
+
+@media (max-width: 1100px) and (min-width: 761px) {
+  .app-shell {
+    grid-template-columns: 210px minmax(0, 1fr);
+  }
+
+  .sidebar {
+    padding-inline: 14px;
+  }
+
+  .content {
+    padding: 24px 20px;
+  }
+}
+
+@media (max-width: 430px) {
+  .identity {
+    gap: 10px;
+
+    strong {
+      font-size: 15px;
+    }
+
+    small {
+      font-size: 12px;
+    }
+  }
+
+}

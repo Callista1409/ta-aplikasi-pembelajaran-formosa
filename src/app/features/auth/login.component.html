@@ -1,0 +1,84 @@
+<main class="login-page">
+  <section class="login-intro" aria-labelledby="login-title">
+    <div class="brand-mark">F</div>
+    <div>
+      <p class="eyebrow">Formosa Mandarin</p>
+      <h1 id="login-title">Masuk ke akunmu</h1>
+      <p>Gunakan akun yang telah didaftarkan untuk membuka dashboard sesuai peran.</p>
+    </div>
+    <img src="assets/panda_default.PNG" alt="Maskot panda Formosa">
+  </section>
+
+  <section class="login-form" aria-label="Form login">
+    <header>
+      <h2>Login</h2>
+    </header>
+
+    <form (ngSubmit)="submit()">
+      <label>
+        <span>Username</span>
+        <input
+          type="text"
+          name="username"
+          autocomplete="username"
+          placeholder="Contoh: emily2018"
+          [(ngModel)]="username"
+          [disabled]="submitting()"
+        >
+      </label>
+
+      <label>
+        <span>Password</span>
+        <input
+          [type]="showPassword ? 'text' : 'password'"
+          name="password"
+          autocomplete="current-password"
+          placeholder="Masukkan password"
+          [(ngModel)]="password"
+          [disabled]="submitting()"
+        >
+      </label>
+
+      <label class="show-password">
+        <input type="checkbox" name="showPassword" [(ngModel)]="showPassword">
+        <span>Tampilkan password</span>
+      </label>
+
+      @if (errorMessage()) {
+        <p class="form-error" role="alert">{{ errorMessage() }}</p>
+      }
+
+      @if (showResetHelp()) {
+        <section class="reset-help" aria-label="Bantuan reset password">
+          <div>
+            <strong>Lupa password?</strong>
+            <p>Masukkan username atau email akun untuk menerima link reset password.</p>
+          </div>
+          <div class="reset-row">
+            <input
+              type="text"
+              name="resetEmail"
+              autocomplete="username"
+              placeholder="username atau email"
+              [(ngModel)]="resetEmail"
+              [disabled]="resetting()"
+            >
+            <button type="button" class="reset-link" [disabled]="resetting()" (click)="resetPassword()">
+              {{ resetting() ? 'Mengirim...' : 'Reset Password' }}
+            </button>
+          </div>
+        </section>
+      }
+
+      @if (resetMessage()) {
+        <p class="form-note" role="status">{{ resetMessage() }}</p>
+      }
+
+      <button class="button" type="submit" [disabled]="submitting()">
+        {{ submitting() ? 'Menghubungkan...' : 'Masuk' }}
+      </button>
+
+      <a class="register-link" routerLink="/register">Belum punya akun? Buat akun</a>
+    </form>
+  </section>
+</main>

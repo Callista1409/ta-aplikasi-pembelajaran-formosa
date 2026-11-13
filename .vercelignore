@@ -1,0 +1,15 @@
+old/
+node_modules/
+**/node_modules/
+.angular/
+dist/
+coverage/
+.tools/
+tmp/
+.vscode/
+**/firebase-service-account*.json
+**/*-firebase-adminsdk-*.json
+.env
+.env.*
+!.env.example
+**/*.log
