@@ -123,6 +123,7 @@ export async function studentAction(db, uid, action, body, now = new Date()) {
     }
 
     if (action === 'practice-start') {
+      // Accept, but ignore, metadata sent by older open browser tabs during rollout.
       keys(body, ['sessionId', 'unitId', 'questionIds', 'anchorQuestionIds']);
       const sessionId = id(body.sessionId), unitId = id(body.unitId);
       if (!Array.isArray(body.questionIds) || body.questionIds.length !== 10 || new Set(body.questionIds).size !== 10) throw error(400, 'Sesi memerlukan 10 soal berbeda.');
@@ -145,14 +146,12 @@ export async function studentAction(db, uid, action, body, now = new Date()) {
         const canonicalQuestion = pretestListeningQuestion({ ...question.data(), id: question.id }, canonicalCard, Number(user.grade));
         return { card: canonicalCard, question: canonicalQuestion, questionId: question.id, category: question.data().category };
       }));
-      keys(body.anchorQuestionIds, categories);
-      if (!categories.every(c => plan.some(p => p.questionId === body.anchorQuestionIds[c] && p.category === c))) throw error(400, 'Soal jangkar tidak sesuai.');
       const account = balance(accountSnapshot), today = periods(now).dateId;
       const sessionOrder = Math.floor(number(account.practiceSessionCount)) + 1;
       const sessionOfDay = account.practiceSessionDateId === today ? Math.floor(number(account.practiceSessionsStartedToday)) + 1 : 1;
       const session = { protocolVersion: 1, studentId: uid, sessionId, sessionOrder, sessionOfDay,
         sessionKind: sessionOfDay === 1 ? 'scheduled' : 'additional', unitId, grade: Number(user.grade),
-        anchorQuestionIds: body.anchorQuestionIds, plan: clean(plan), questionCount: 10, answerCount: 0,
+        plan: clean(plan), questionCount: 10, answerCount: 0,
         pendingPoints: 0, status: 'in_progress', startedDateId: today };
       saveBalance({ ...account, practiceSessionCount: sessionOrder, practiceSessionDateId: today, practiceSessionsStartedToday: sessionOfDay });
       tx.set(sessionRef, { ...session, startedAt: stamp() });
@@ -177,7 +176,7 @@ export async function studentAction(db, uid, action, body, now = new Date()) {
         saveBalance({ ...account, starBalance: account.starBalance + earned, totalStarsEarned: account.totalStarsEarned + earned });
         tx.update(sessionRef, { status: 'completed', totalPoints: earned, completedAt: stamp() });
         log(logId, { type: 'test_session', unitId: session.unitId, sessionId, sessionOrder: session.sessionOrder,
-          sessionOfDay: session.sessionOfDay, sessionKind: session.sessionKind, anchorQuestionIds: session.anchorQuestionIds,
+          sessionOfDay: session.sessionOfDay, sessionKind: session.sessionKind,
           pointEarned: earned, questionCount: session.questionCount,
           categoryCounts: Object.fromEntries(categories.map(c => [c, session.plan.filter(p => p.category === c).length])) });
         return { points: earned, credited: true, logId };
@@ -205,7 +204,7 @@ export async function studentAction(db, uid, action, body, now = new Date()) {
       tx.set(progressRef, { ...progress, lastAnsweredAt: stamp(), updatedAt: stamp() });
       tx.create(eventRef, { studentId: uid, sessionId, sessionOrder: session.sessionOrder, questionOrder: body.questionOrder,
         questionId: item.questionId, flashcardId: item.card.id, unitId: session.unitId, category: item.category,
-        isAnchor: Object.values(session.anchorQuestionIds).includes(item.questionId), ...assessment, awardedPoint,
+        ...assessment, awardedPoint,
         submission: submission(body), progress, createdAt: stamp() });
       tx.update(sessionRef, { answerCount: session.answerCount + 1, pendingPoints: session.pendingPoints + awardedPoint });
       return { awardedPoint, correct: assessment.correct, progress };
@@ -299,7 +298,7 @@ export async function studentAction(db, uid, action, body, now = new Date()) {
 
 function allocation(session) {
   return { sessionId: session.sessionId, sessionOrder: session.sessionOrder, sessionOfDay: session.sessionOfDay,
-    sessionKind: session.sessionKind, anchorQuestionIds: session.anchorQuestionIds, plan: session.plan };
+    sessionKind: session.sessionKind, plan: session.plan };
 }
 function posttestAnswer(item, body) {
   const assessment = assess(item, body, true);

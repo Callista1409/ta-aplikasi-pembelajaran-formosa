@@ -294,13 +294,13 @@ test('practice waits for questions, prevents duplicate starts, and aborts if the
   let resolve, loads = 0, navigations = 0, unit = 'one';
   const harness = {
     posttestMode: false, canTest: () => true, practiceLoading: core.signal(false), practiceError: core.signal(''),
-    practiceSavePending: core.signal(false), practiceAnswerLogError: core.signal(''), choosePracticeAnchorIds: () => ({}),
+    practiceSavePending: core.signal(false), practiceAnswerLogError: core.signal(''),
     selectedUnit: () => ({ id: unit, grade: 1 }), step: () => 'cards', learnedCards: () => [{ id: 'learned-card' }],
     data: { loadPracticeQuestions: (ids) => {
       loads++; assert.deepEqual(plain(ids), ['learned-card']);
       return new Promise((done) => { resolve = done; });
     }, questions: () => [] },
-    learning: { loadQuestionProgress: async () => {}, beginPracticeSession: async () => ({ sessionId: 'test', sessionOrder: 1, sessionOfDay: 1, sessionKind: 'scheduled', anchorQuestionIds: {}, plan: Array.from({ length: 10 }, (_, index) => ({ questionId: `q-${index}` })) }) },
+    learning: { loadQuestionProgress: async () => {}, beginPracticeSession: async () => ({ sessionId: 'test', sessionOrder: 1, sessionOfDay: 1, sessionKind: 'scheduled', plan: Array.from({ length: 10 }, (_, index) => ({ questionId: `q-${index}` })) }) },
     testPlan: core.signal(Array.from({ length: 10 }, (_, index) => ({ questionId: `q-${index}` }))), createTestPlan: () => {},
     questionNumber: core.signal(0), score: core.signal(0), resetQuestionState: () => {},
     navigateStep: () => { navigations++; }, destroyed: false,

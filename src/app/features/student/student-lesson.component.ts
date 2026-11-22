@@ -81,7 +81,6 @@ export class StudentLessonComponent implements OnDestroy {
   private practiceSessionOrder = 0;
   private practiceSessionOfDay = 0;
   private practiceSessionKind: 'scheduled' | 'additional' = 'scheduled';
-  private practiceAnchorQuestionIds: Record<QuestionCategory, string> | null = null;
   private practiceSessionCompleted = false;
   private advanceAfterPracticeAnswerSave = false;
   protected readonly answered = signal(false);
@@ -536,8 +535,7 @@ export class StudentLessonComponent implements OnDestroy {
       await this.data.loadPracticeQuestions(cardIds);
       await this.learning.loadQuestionProgress(this.data.questions().filter(question => cardIds.includes(question.flashcardId)).map(question => question.id));
       if (this.destroyed || this.selectedUnit()?.id !== unitId || this.step() !== previousStep || !this.canTest()) return;
-      const candidateAnchors = this.choosePracticeAnchorIds();
-      this.createTestPlan(candidateAnchors);
+      this.createTestPlan();
       if (this.testPlan().length !== 10) throw new Error('Soal unit ini belum lengkap. Hubungi guru untuk melengkapi soal.');
       if (this.practiceStartUnitId !== unitId) {
         this.practiceStartRequestId = null;
@@ -546,7 +544,6 @@ export class StudentLessonComponent implements OnDestroy {
       const allocation = await this.learning.beginPracticeSession(
         this.selectedUnit()?.id ?? unitId ?? '',
         this.selectedUnit()?.grade ?? this.currentStudent()?.grade ?? 1,
-        candidateAnchors,
         this.testPlan().map(item => item.questionId),
         this.practiceStartRequestId ??= crypto.randomUUID(),
       );
@@ -559,11 +556,10 @@ export class StudentLessonComponent implements OnDestroy {
       this.practiceSessionOrder = allocation.sessionOrder;
       this.practiceSessionOfDay = allocation.sessionOfDay;
       this.practiceSessionKind = allocation.sessionKind;
-      this.practiceAnchorQuestionIds = allocation.anchorQuestionIds;
       this.practiceSessionCompleted = false;
       this.testPlan.set(allocation.plan);
       this.practiceStartRequestId = null;
-      if (this.testPlan().length !== 10) throw new Error('Soal unit ini belum lengkap untuk memuat jangkar dan soal latihan. Hubungi guru.');
+      if (this.testPlan().length !== 10) throw new Error('Soal unit ini belum lengkap. Hubungi guru untuk melengkapi soal.');
       this.pendingPracticeAnswer = null;
       this.practiceAnswerLogError.set('');
       this.questionNumber.set(1);
@@ -723,7 +719,6 @@ export class StudentLessonComponent implements OnDestroy {
         sessionOrder: this.practiceSessionOrder,
         sessionOfDay: this.practiceSessionOfDay,
         sessionKind: this.practiceSessionKind,
-        anchorQuestionIds: this.practiceAnchorQuestionIds ?? undefined,
         categoryCounts: this.testCategorySummary(),
         questionCount: this.testLength(),
         unitId: this.selectedUnitId(),
@@ -895,45 +890,7 @@ export class StudentLessonComponent implements OnDestroy {
     }, {});
   }
 
-  private choosePracticeAnchorIds(): Record<QuestionCategory, string> {
-    const categories: QuestionCategory[] = ['reading', 'listening', 'speaking', 'writing'];
-    const learnedIds = new Set(this.learnedCards().map(card => card.id));
-    const unit = this.selectedUnit();
-    const sourceWords = unit ? curriculumVocabularyOrder(unit.grade, unitChapter(unit) ?? 0) : undefined;
-    const firstFiveWords = sourceWords?.slice(0, 5);
-    const firstFiveCards = firstFiveWords
-      ? firstFiveWords.map(word => this.cards().find(card => {
-        const expectedForms = curriculumHanziForms(word).map(normalizeHanziOrder);
-        return curriculumHanziForms(card.hanzi).some(form => expectedForms.includes(normalizeHanziOrder(form)));
-      }))
-      : this.cards().slice(0, 5);
-    if (firstFiveCards.length < 5) throw new Error('Unit ini belum memiliki lima kosakata pertama untuk sesi penelitian.');
-    if (firstFiveCards.some(card => !card)) {
-      const missing = firstFiveWords?.filter((word, index) => !firstFiveCards[index]).join(', ');
-      throw new Error(`Kosakata urutan sumber belum lengkap pada unit ini${missing ? `: ${missing}` : ''}. Hubungi guru untuk menyesuaikan materi.`);
-    }
-    const resolvedFirstFive = firstFiveCards as Flashcard[];
-    if (resolvedFirstFive.some(card => !learnedIds.has(card.id))) {
-      throw new Error('Pelajari dan tandai lima kosakata pertama pada unit ini sebelum memulai sesi penelitian.');
-    }
-    const questions = this.data.questions().filter(question => learnedIds.has(question.flashcardId));
-    const anchorCards: Record<QuestionCategory, Flashcard> = {
-      reading: resolvedFirstFive[0],
-      listening: resolvedFirstFive[1],
-      speaking: resolvedFirstFive[2],
-      writing: resolvedFirstFive[3],
-    };
-    const anchors = {} as Record<QuestionCategory, string>;
-    for (const category of categories) {
-      const candidate = questions.find(question => question.category === category
-        && question.flashcardId === anchorCards[category].id);
-      if (!candidate) throw new Error(`Soal jangkar kategori ${category} belum tersedia untuk lima kosakata pertama unit ini.`);
-      anchors[category] = candidate.id;
-    }
-    return anchors;
-  }
-
-  private createTestPlan(anchorQuestionIds: Record<QuestionCategory, string>): void {
+  private createTestPlan(): void {
     const categoryQuotas: Array<{ category: QuestionCategory; count: number }> = [
       { category: 'reading', count: 3 },
       { category: 'listening', count: 2 },
@@ -948,13 +905,7 @@ export class StudentLessonComponent implements OnDestroy {
       const candidates = this.data.questions()
         .filter((question) => question.category === category && learnedIds.has(question.flashcardId))
         .filter((question) => !usedQuestionIds.has(question.id));
-      const anchor = candidates.find(question => question.id === anchorQuestionIds[category]);
-      if (!anchor) throw new Error(`Soal jangkar kategori ${category} tidak tersedia pada unit ini. Pelajari kembali materi terkait.`);
-      const anchorCard = this.data.flashcards().find(item => item.id === anchor.flashcardId);
-      if (!anchorCard) throw new Error(`Flashcard untuk soal jangkar kategori ${category} tidak ditemukan.`);
-      plan.push({ card: anchorCard, category, questionId: anchor.id });
-      usedQuestionIds.add(anchor.id);
-      for (let index = 1; index < count; index += 1) {
+      for (let index = 0; index < count; index += 1) {
         const selected = this.weightedQuestionPick(candidates.filter((question) => !usedQuestionIds.has(question.id)));
         if (!selected) break;
         usedQuestionIds.add(selected.id);
@@ -1003,7 +954,6 @@ export class StudentLessonComponent implements OnDestroy {
       flashcardId: card.id,
       unitId: this.selectedUnitId(),
       category: this.testCategory(),
-      isAnchor: Object.values(this.practiceAnchorQuestionIds ?? {}).includes(question.id),
       correct,
       basePoint,
       awardedPoint,

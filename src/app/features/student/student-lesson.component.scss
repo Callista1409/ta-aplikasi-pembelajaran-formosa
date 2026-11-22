@@ -41,7 +41,7 @@
 .card-toolbar .format-button { border-color:#f0c86a; color:#8a5b08; background:#fff3c9; }
 .card-toolbar .vocabulary-button:hover { filter:brightness(.98); transform:translateY(-1px); }
 .vocabulary-button:hover { border-color:var(--brand); background:var(--brand-soft); }
-.card-toolbar app-ui-select { min-width:132px; }
+.card-toolbar app-ui-select { min-width:168px; }
 .carousel { display:grid; grid-template-columns:56px minmax(0,520px) 56px; align-items:center; justify-content:center; gap:24px; min-width:0; }
 .arrow { display:grid; place-items:center; width:48px; height:56px; border-radius:7px; color:var(--ink); background:transparent; font-size:54px; line-height:1; }
 .arrow:hover { color:var(--brand-dark); background:var(--brand-soft); }

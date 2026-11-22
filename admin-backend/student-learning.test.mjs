@@ -33,8 +33,7 @@ async function fixture(stars = 600) {
   batch.set(db.doc(`accessories/${accessoryId}`), { price: 350, active: true });
   await batch.commit();
   const call = (action, body = {}) => studentAction(db, uid, action, body, new Date('2026-11-06T05:00:00Z'));
-  const startBody = { sessionId: randomUUID(), unitId, questionIds,
-    anchorQuestionIds: Object.fromEntries(categories.slice(0, 4).map((c, i) => [c, questionIds[i]])) };
+  const startBody = { sessionId: randomUUID(), unitId, questionIds };
   return { uid, unitId, accessoryId, call, startBody, categories };
 }
 
@@ -91,6 +90,47 @@ integration('practice uses canonical questions, enforces order and credits only 
   assert.equal((await value('studentPoints', f.uid)).starBalance, expected);
   const other = await fixture();
   await assert.rejects(other.call('practice-finish', { sessionId: session.sessionId }), { status: 404 });
+});
+
+integration('practice no longer requires fixed questions and omits obsolete metadata from new records', async () => {
+  const f = await fixture(0);
+  const session = await f.call('practice-start', f.startBody);
+  assert.equal(session.plan.length, 10);
+  assert.equal('anchorQuestionIds' in session, false);
+  assert.equal('anchorQuestionIds' in await value('studentPracticeSessions', `${f.uid}_${session.sessionId}`), false);
+  for (let order = 1; order <= 10; order++) {
+    await f.call('practice-answer', { sessionId: session.sessionId, questionOrder: order,
+      response: '', skipped: true, writingMistakes: 0, writingStrokes: 0 });
+  }
+  const completed = await f.call('practice-finish', { sessionId: session.sessionId });
+  assert.equal(completed.credited, true);
+  assert.equal('isAnchor' in await value('studentPracticeAnswerEvents', `${f.uid}_${session.sessionId}_1`), false);
+  assert.equal('anchorQuestionIds' in await value('studentActivityLogs', completed.logId), false);
+  // A cached old frontend may still send this field; it must not constrain selection or be persisted.
+  const next = await f.call('practice-start', { ...f.startBody, sessionId: randomUUID(), anchorQuestionIds: {} });
+  assert.equal('anchorQuestionIds' in next, false);
+});
+
+integration('an existing session with legacy metadata can continue and finish without a restart', async () => {
+  const f = await fixture(0);
+  const session = await f.call('practice-start', f.startBody);
+  const legacy = Object.fromEntries(f.categories.slice(0, 4).map((category, i) => [category, f.startBody.questionIds[i]]));
+  await db.doc(`studentPracticeSessions/${f.uid}_${session.sessionId}`).update({ anchorQuestionIds: legacy });
+  const first = { sessionId: session.sessionId, questionOrder: 1, response: 'halo', skipped: false, writingMistakes: 0, writingStrokes: 0 };
+  await f.call('practice-answer', first);
+  await db.doc(`studentPracticeAnswerEvents/${f.uid}_${session.sessionId}_1`).update({ isAnchor: true });
+  const resumed = await f.call('practice-start', f.startBody);
+  assert.deepEqual(resumed.plan, session.plan);
+  assert.equal('anchorQuestionIds' in resumed, false);
+  assert.equal((await f.call('practice-answer', first)).awardedPoint, 7);
+  for (let order = 2; order <= 10; order++) {
+    await f.call('practice-answer', { ...first, questionOrder: order, response: '', skipped: true });
+  }
+  const result = await f.call('practice-finish', { sessionId: session.sessionId });
+  assert.equal(result.points, 7); assert.equal(result.credited, true);
+  assert.equal((await f.call('practice-finish', { sessionId: session.sessionId })).credited, false);
+  assert.equal((await value('studentPoints', f.uid)).starBalance, 7);
+  assert.deepEqual((await value('studentPracticeSessions', `${f.uid}_${session.sessionId}`)).anchorQuestionIds, legacy);
 });
 
 integration('R3 rewards decrease 10/7/3/0 across sessions and retries do not consume another reward', async () => {
@@ -172,6 +212,48 @@ integration('posttest plan and scores come from canonical server curriculum, ans
   assert.equal((await value('studentAssessmentLegacy', session.id)).score, 999999);
   const snapshots = await Promise.all([f.call('posttest-start'), f.call('posttest-start')]);
   assert.deepEqual(snapshots.map(item => item.answers.length), [1, 1]);
+});
+
+integration('a complete posttest preserves its plan, fractional scores and history without awarding practice stars', async () => {
+  const f = await fixture();
+  const batch = db.batch();
+  for (const [index, requirement] of posttestRequirements(1).entries()) {
+    const unitId = `curriculum-g1-chapter-${requirement.chapter}`;
+    batch.set(db.doc(`units/${unitId}`), { name: `Pelajaran ${requirement.chapter}`, grade: 1 });
+    batch.set(db.doc(`flashcards/curriculum-${index}`), { unitId, hanzi: requirement.word, meaning: requirement.word, pinyin: 'pinyin' });
+  }
+  await batch.commit();
+  const accountBefore = await value('studentPoints', f.uid);
+  const session = await f.call('posttest-start');
+  assert.equal(session.plan.length, 60);
+  for (const category of ['reading', 'listening', 'speaking', 'writing']) {
+    assert.equal(session.plan.filter(item => item.category === category).length, 15);
+  }
+  let result;
+  for (const [index, item] of session.plan.entries()) {
+    const writing = item.category === 'writing';
+    const body = { questionId: item.questionId,
+      response: writing || item.category === 'speaking' ? item.card.hanzi : item.question.correctAnswer,
+      skipped: false, writingMistakes: writing ? 2 : 0, writingStrokes: writing ? 10 : 0 };
+    result = await f.call('posttest-answer', body);
+    if (index === 9) {
+      const resumed = await f.call('posttest-start');
+      assert.deepEqual(resumed.plan, session.plan);
+      assert.equal(resumed.answers.length, 10);
+    }
+    if (index === 59) assert.equal((await f.call('posttest-answer', body)).answers.length, 60);
+  }
+  assert.equal(result.status, 'completed');
+  assert.equal(result.score, 57); assert.equal(result.percentage, 95);
+  assert.equal(result.categories.find(row => row.category === 'writing').score, 12);
+  const completed = await f.call('posttest-start');
+  assert.deepEqual(completed.plan, session.plan);
+  assert.deepEqual(completed.answers, result.answers);
+  assert.equal(completed.score, result.score);
+  assert.deepEqual(await value('studentPoints', f.uid), accountBefore);
+  for (const collection of ['studentQuestionProgress', 'studentPracticeSessions', 'studentActivityLogs']) {
+    assert.equal((await db.collection(collection).where('studentId', '==', f.uid).get()).empty, true);
+  }
 });
 
 integration('HTTP student routes authenticate the token, ignore no injected identity, and enforce payload limits', async () => {

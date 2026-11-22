@@ -59,7 +59,6 @@ export interface TestResultDetail {
   unitId?: string;
   questionCount?: number;
   categoryCounts?: Partial<CategoryCounts>;
-  anchorQuestionIds?: Partial<Record<QuestionCategory, string>>;
 }
 
 export interface PracticeAnswerEventInput {
@@ -70,7 +69,6 @@ export interface PracticeAnswerEventInput {
   flashcardId: string;
   unitId: string;
   category: QuestionCategory;
-  isAnchor: boolean;
   response: string;
   skipped: boolean;
   writingMistakes: number;
@@ -86,7 +84,6 @@ export interface PracticeSessionAllocation {
   sessionOrder: number;
   sessionOfDay: number;
   sessionKind: 'scheduled' | 'additional';
-  anchorQuestionIds: Record<QuestionCategory, string>;
 }
 
 export type QuestionAttemptStatus = 'unseen' | 'wrong' | 'correct';
@@ -288,12 +285,12 @@ export class StudentLearningService {
   }
 
   async beginPracticeSession(
-    unitId: string, _grade: number, anchorQuestionIds: Record<QuestionCategory, string>, questionIds: string[], sessionId: string,
+    unitId: string, _grade: number, questionIds: string[], sessionId: string,
   ): Promise<PracticeSessionAllocation> {
     if (!this.isCurrentStudent() || !this.pointsLoaded() || this.starSaving()) throw new Error('Sesi latihan belum siap.');
     this.starSaving.set(true); this.starError.set('');
     try {
-      return await this.api.post<PracticeSessionAllocation>('practice-start', { sessionId, unitId, anchorQuestionIds, questionIds });
+      return await this.api.post<PracticeSessionAllocation>('practice-start', { sessionId, unitId, questionIds });
     } catch (error) {
       this.starError.set(error instanceof Error ? error.message : 'Sesi belum dapat dimulai.');
       throw error;
